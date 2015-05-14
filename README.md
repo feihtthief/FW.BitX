@@ -1,3 +1,3 @@
 # FW.BitX
 
-Dabbling with BitX bitcoing exchange in C#
+Dabbling with BitX bitcoin exchange in C#
