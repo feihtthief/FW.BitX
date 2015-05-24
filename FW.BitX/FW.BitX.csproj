@@ -44,10 +44,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BitXClient.cs" />
+    <Compile Include="Entities\Local\OrderBook.cs" />
+    <Compile Include="Entities\Local\OrderBookEntry.cs" />
     <Compile Include="Entities\Local\Trade.cs" />
     <Compile Include="Entities\Local\TradeInfo.cs" />
+    <Compile Include="Entities\Remote\BitX_OrderBookEntry.cs" />
     <Compile Include="Entities\Remote\BitX_Trade.cs" />
-    <Compile Include="Entities\Remote\BitX_TradeQueryResponse.cs" />
+    <Compile Include="Entities\Remote\BitX_Trade_QueryResponse.cs" />
+    <Compile Include="Entities\Remote\BitX_OrderBook_QueryResponse.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -12,24 +12,74 @@ namespace FW.BitX
 {
     public class BitXClient
     {
-        private string _a;
-        private string _b;
+        private const string BaseUrlApi = "https://api.mybitx.com/api/1/";
+        private const string BaseUrlWeb = "https://bitx.co/ajax/1/";
+
+        private string _Username;
+        private string _Password;
 
         public BitXClient()
         {
         }
 
-        public BitXClient(string a, string b)
+        public BitXClient(string username, string password)
         {
-            this._a = a;
-            this._b = b;
+            this._Username = username;
+            this._Password = password;
         }
 
-        public TradeInfo GetTrades()
+        public OrderBook GetOrderBookFromWeb()
+        {
+            return GetOrderBookFromEndpoint(BaseUrlWeb + "orderbook?pair=XBTZAR");
+        }
+
+        public OrderBook GetOrderBookFromApi()
+        {
+            return GetOrderBookFromEndpoint(BaseUrlApi + "orderbook?pair=XBTZAR");
+        }
+
+        private OrderBook GetOrderBookFromEndpoint(string url)
         {
             var restClient = new RestClient();
-            var restRepsonse = restClient.ExecuteRequest("https://api.mybitx.com/api/1/trades?pair=XBTZAR", null);
-            var payload = JsonConvert.DeserializeObject<BitX_TradeQueryResponse>(restRepsonse.ResponseContent);
+            var restRepsonse = restClient.ExecuteRequest(url, null);
+            var payload = JsonConvert.DeserializeObject<BitX_OrderBook_QueryResponse>(restRepsonse.ResponseContent);
+            var result = new OrderBook
+            {
+                Currency = payload.currency,
+                TimeStamp = UnixTime.FromUnixTime(payload.timestamp),
+            };
+            PopulateOrderBookEntries(result.Asks, payload.asks);
+            PopulateOrderBookEntries(result.Bids, payload.bids);
+            return result;
+        }
+
+        private void PopulateOrderBookEntries(List<OrderBookEntry> list, BitX_OrderBookEntry[] entries)
+        {
+            foreach (var item in entries)
+            {
+                list.Add(new OrderBookEntry
+                {
+                    Price = Decimal.Parse(item.price),
+                    Volume = Decimal.Parse(item.volume),
+                });
+            }
+        }
+
+        public TradeInfo GetTradesFromWeb()
+        {
+            return GetTradesFromUrl(BaseUrlWeb + "trades?pair=XBTZAR");
+        }
+
+        public TradeInfo GetTradesFromApi()
+        {
+            return GetTradesFromUrl(BaseUrlApi + "trades?pair=XBTZAR");
+        }
+
+        private TradeInfo GetTradesFromUrl(string url)
+        {
+            var restClient = new RestClient();
+            var restRepsonse = restClient.ExecuteRequest(url, null);
+            var payload = JsonConvert.DeserializeObject<BitX_Trade_QueryResponse>(restRepsonse.ResponseContent);
             var result = new TradeInfo
             {
                 Currency = payload.currency,
@@ -44,7 +94,6 @@ namespace FW.BitX
                 });
             }
             return result;
-
         }
 
     }

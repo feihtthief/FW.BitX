@@ -47,7 +47,7 @@ namespace FW.BitX.TestApp
 
         private void btnGetTrades_Click(object sender, EventArgs e)
         {
-            var tradeInfo = client.GetTrades();
+            var tradeInfo = client.GetTradesFromApi();
             PopulateListView(lvTrades, tradeInfo.Trades, TradeMap);
             //lvTrades.BeginUpdate();
             //try
