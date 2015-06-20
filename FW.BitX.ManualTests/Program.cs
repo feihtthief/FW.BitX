@@ -20,13 +20,13 @@ namespace FW.BitX.ManualTests
 			var orderbook_A = c.GetOrderBookFromApi();
 			Console.WriteLine("Asks: {0}", orderbook_A.Asks.Count());
 			Console.WriteLine("Bids: {0}", orderbook_A.Bids.Count());
-			Console.WriteLine("Bids: {0}", orderbook_A.TimeStamp);
+			Console.WriteLine("Bids: {0}", orderbook_A.TimeStampUTC);
 			Console.WriteLine();
 
 			var orderbook_W = c.GetOrderBookFromWeb();
 			Console.WriteLine("Asks: {0}", orderbook_W.Asks.Count());
 			Console.WriteLine("Bids: {0}", orderbook_W.Bids.Count());
-			Console.WriteLine("Bids: {0}", orderbook_W.TimeStamp);
+			Console.WriteLine("Bids: {0}", orderbook_W.TimeStampUTC);
 			Console.WriteLine();
 
 			foreach (var ask in orderbook_W.Asks)
@@ -79,8 +79,8 @@ namespace FW.BitX.ManualTests
 				var b = ti_W.Trades[i];
 				var areSame = true
 					&& (a.Price == b.Price)
-					&& (a.TimeStamp == b.TimeStamp)
-					&& (a.TimeStamp == b.TimeStamp)
+					&& (a.TimeStampUTC == b.TimeStampUTC)
+					&& (a.TimeStampUTC == b.TimeStampUTC)
 					;
 				if (areSame)
 				{
