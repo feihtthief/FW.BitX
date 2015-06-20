@@ -47,7 +47,7 @@ namespace FW.BitX
 			{
 				Currency = payload.currency,
 				BitXTimeStamp = payload.timestamp,
-				TimeStamp = UnixTime.FromUnixTimeUTC(payload.timestamp),
+				TimeStampUTC = UnixTime.FromUnixTimeUTC(payload.timestamp),
 			};
 			PopulateOrderBookEntries(result.Asks, payload.asks);
 			PopulateOrderBookEntries(result.Bids, payload.bids);
@@ -91,8 +91,8 @@ namespace FW.BitX
 				{
 					Price = Decimal.Parse(item.price),
 					Volume = Decimal.Parse(item.volume),
-					BitXTimeStamp = item.timestamp,
-					TimeStamp = UnixTime.FromUnixTimeUTC(item.timestamp),
+					BitXTimeStamp  = item.timestamp,
+					TimeStampUTC = UnixTime.FromUnixTimeUTC(item.timestamp),
 				});
 			}
 			return result;

@@ -10,7 +10,7 @@ namespace FW.BitX.Entities.Local
 	{
 		public string Currency { get; set; }
 		public long BitXTimeStamp { get; set; }
-		public DateTime TimeStamp { get; set; }
+		public DateTime TimeStampUTC { get; set; }
 
 		public List<OrderBookEntry> Asks { get; private set; }
 		public List<OrderBookEntry> Bids { get; private set; }
@@ -20,6 +20,5 @@ namespace FW.BitX.Entities.Local
 			this.Asks = new List<OrderBookEntry>();
 			this.Bids = new List<OrderBookEntry>();
 		}
-
 	}
 }
