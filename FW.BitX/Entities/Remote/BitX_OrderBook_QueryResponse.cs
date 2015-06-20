@@ -6,14 +6,13 @@ using System.Threading.Tasks;
 
 namespace FW.BitX.Entities.Remote
 {
-    public class BitX_OrderBook_QueryResponse
-    {
-        public long timestamp { get; set; }
-        public BitX_OrderBookEntry[] asks { get; set; }
-        public BitX_OrderBookEntry[] bids { get; set; }
+	public class BitX_OrderBook_QueryResponse
+	{
+		public long timestamp { get; set; }
+		public BitX_OrderBookEntry[] asks { get; set; }
+		public BitX_OrderBookEntry[] bids { get; set; }
 
-        public string currency { get; set; }
-    }
+		public string currency { get; set; }
+	}
 
- 
 }

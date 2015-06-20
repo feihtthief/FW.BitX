@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace FW.Utils
 {
-    public class RestResponse
-    {
-        public HttpStatusCode StatusCode { get; set; }
-        public string ResponseContent { get; set; }
-    }
+	public class RestResponse
+	{
+		public HttpStatusCode StatusCode { get; set; }
+		public string ResponseContent { get; set; }
+	}
 }

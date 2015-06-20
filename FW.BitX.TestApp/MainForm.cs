@@ -1,9 +1,11 @@
 ﻿using FW.BitX.Entities.Local;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,7 +15,7 @@ namespace FW.BitX.TestApp
 {
 	public partial class MainForm : Form
 	{
-		private BitXClient client = new BitXClient();
+		private static readonly string NL = Environment.NewLine;
 
 		private List<Func<Trade, string>> TradeMap;
 
@@ -25,6 +27,29 @@ namespace FW.BitX.TestApp
 		private void MainForm_Load(object sender, EventArgs e)
 		{
 			TradeMap = BuildTradesMap(lvTrades);
+			TryLoadSettings();
+		}
+
+		private void TryLoadSettings()
+		{
+			try
+			{
+				var settings = JsonConvert.DeserializeObject<Settings>(File.ReadAllText(@"c:\Configs\BitX\settings.json"));
+				if (settings != null)
+				{
+					txtApiKey.Text = settings.ApiKey ?? "";
+					txtApiSecret.Text = settings.ApiSecret ?? "";
+				}
+			}
+			catch (Exception exc)
+			{
+				Notice(String.Format("Error reading config: {0}{1}", NL, exc));
+			}
+		}
+
+		private void Notice(string message)
+		{
+			lblMessages.Text = message;
 		}
 
 		private List<Func<Trade, string>> BuildTradesMap(ListView listview)
@@ -47,6 +72,7 @@ namespace FW.BitX.TestApp
 
 		private void btnGetTrades_Click(object sender, EventArgs e)
 		{
+			var client = new BitXClient();
 			var tradeInfo = client.GetTradesFromApi();
 			PopulateListView(lvTrades, tradeInfo.Trades, TradeMap);
 			//lvTrades.BeginUpdate();
@@ -89,6 +115,19 @@ namespace FW.BitX.TestApp
 			foreach (ColumnHeader col in listView.Columns)
 			{
 				col.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+			}
+		}
+
+		private void btnGetTransactions_Click(object sender, EventArgs e)
+		{
+			try
+			{
+				var client = new BitXClient(txtApiKey.Text, txtApiSecret.Text);
+				client.GetBalances();
+			}
+			catch (Exception exc)
+			{
+				Notice(String.Format("Error reading config: {0}{1}", NL, exc));
 			}
 		}
 

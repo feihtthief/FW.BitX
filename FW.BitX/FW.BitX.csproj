@@ -36,6 +36,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -46,12 +47,20 @@
     <Compile Include="BitXClient.cs" />
     <Compile Include="Entities\Local\OrderBook.cs" />
     <Compile Include="Entities\Local\OrderBookEntry.cs" />
+    <Compile Include="Entities\Local\AccountBalance.cs" />
     <Compile Include="Entities\Local\Trade.cs" />
     <Compile Include="Entities\Local\TradeInfo.cs" />
+    <Compile Include="Entities\Local\TransactionEntry.cs" />
+    <Compile Include="Entities\Remote\BitX_Account.cs" />
+    <Compile Include="Entities\Remote\BitX_Accounts_QueryResponse.cs" />
+    <Compile Include="Entities\Remote\BitX_Balances_QueryResponse.cs" />
     <Compile Include="Entities\Remote\BitX_OrderBookEntry.cs" />
+    <Compile Include="Entities\Remote\BitX_Balance.cs" />
     <Compile Include="Entities\Remote\BitX_Trade.cs" />
     <Compile Include="Entities\Remote\BitX_Trade_QueryResponse.cs" />
     <Compile Include="Entities\Remote\BitX_OrderBook_QueryResponse.cs" />
+    <Compile Include="Entities\Remote\BitX_Transaction.cs" />
+    <Compile Include="Entities\Remote\BitX_Transactions_QueryResponse.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

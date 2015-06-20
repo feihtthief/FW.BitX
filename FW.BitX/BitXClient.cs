@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace FW.BitX
 {
@@ -15,17 +16,17 @@ namespace FW.BitX
 		private const string BaseUrlApi = "https://api.mybitx.com/api/1/";
 		private const string BaseUrlWeb = "https://bitx.co/ajax/1/";
 
-		private string _Username;
-		private string _Password;
+		private string _ApiKey;
+		private string _ApiSecret;
 
 		public BitXClient()
 		{
 		}
 
-		public BitXClient(string username, string password)
+		public BitXClient(string apiKey, string apiSecret)
 		{
-			this._Username = username;
-			this._Password = password;
+			this._ApiKey = apiKey;
+			this._ApiSecret = apiSecret;
 		}
 
 		public OrderBook GetOrderBookFromWeb()
@@ -91,12 +92,71 @@ namespace FW.BitX
 				{
 					Price = Decimal.Parse(item.price),
 					Volume = Decimal.Parse(item.volume),
-					BitXTimeStamp  = item.timestamp,
+					BitXTimeStamp = item.timestamp,
 					TimeStampUTC = UnixTime.FromUnixTimeUTC(item.timestamp),
 				});
 			}
 			return result;
 		}
 
+		public List<AccountBalance> GetBalances()
+		{
+			return GetBalancesFromUrl(BaseUrlApi + "balance");
+		}
+
+		private List<AccountBalance> GetBalancesFromUrl(string url)
+		{
+			var restClient = new RestClient(_ApiKey, _ApiSecret);
+			var restResponse = restClient.ExecuteRequest(url, null);
+			var payload = JsonConvert.DeserializeObject<BitX_Balances_QueryResponse>(restResponse.ResponseContent);
+			var result = new List<AccountBalance>();
+			foreach (var balance in payload.balance)
+			{
+				result.Add(new AccountBalance
+				{
+					AccountID = balance.account_id,
+					Asset = balance.asset,
+					Name = balance.name,
+					Balance = Decimal.Parse(balance.balance),
+					Reserved = Decimal.Parse(balance.reserved),
+					Unconfirmed = Decimal.Parse(balance.unconfirmed),
+				});
+			}
+			return result;
+		}
+
+		public List<TransactionEntry> GetTransactions(string accountID, int minRow, int maxRow)
+		{
+			return GetTransactionsFromUrl(BaseUrlApi + "accounts/"
+				+ HttpUtility.UrlEncode(accountID) + "/transactions"
+				+ "?min_row=" + HttpUtility.UrlEncode(minRow.ToString())
+				+ "&max_row=" + HttpUtility.UrlEncode(maxRow.ToString())
+			);
+		}
+
+		private List<TransactionEntry> GetTransactionsFromUrl(string url)
+		{
+			var restClient = new RestClient(_ApiKey, _ApiSecret);
+			var restResponse = restClient.ExecuteRequest(url, null);
+			var payload = JsonConvert.DeserializeObject<BitX_Transactions_QueryResponse>(restResponse.ResponseContent);
+			var result = new List<TransactionEntry>();
+			foreach (var transaction in payload.transactions)
+			{
+				result.Add(new TransactionEntry
+				{
+					RowIndex = transaction.row_index,
+					BitXTimeStamp = transaction.timestamp,
+					TimeStampUTC = UnixTime.FromUnixTimeUTC(transaction.timestamp),
+					Balance = (Decimal)transaction.balance,
+					Available = (Decimal)transaction.available,
+					BalanceDelta = (Decimal)transaction.balance_delta,
+					AvailableDelta = (Decimal)transaction.available_delta,
+					Currency = transaction.currency,
+					Description = transaction.description,
+
+				});
+			}
+			return result;
+		}
 	}
 }

@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace FW.BitX.Entities.Remote
 {
-	public class BitX_OrderBookEntry
+	// todo: implement
+
+	public class BitX_Accounts_QueryResponse
 	{
-		public string price { get; set; }
-		public string volume { get; set; }
+		public BitX_Account[] accounts { get; set; }
 	}
 }

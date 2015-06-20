@@ -6,9 +6,12 @@ using System.Threading.Tasks;
 
 namespace FW.BitX.Entities.Remote
 {
-	public class BitX_OrderBookEntry
+	// curl -u keyid:keysecret https://api.mybitx.com/api/1/balance
+
+	public class BitX_Balances_QueryResponse
 	{
-		public string price { get; set; }
-		public string volume { get; set; }
+		public BitX_Balance[] balance { get; set; }
 	}
 }
+
+
