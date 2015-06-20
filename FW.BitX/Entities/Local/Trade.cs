@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 
 namespace FW.BitX.Entities.Local
 {
-    public class Trade
-    {
-        public decimal Price { get; set; }
-        public decimal Volume { get; set; }
-        public DateTime TimeStamp { get; set; }
-    }
+	public class Trade
+	{
+		public decimal Price { get; set; }
+		public decimal Volume { get; set; }
+		public long BitXTimeStamp { get; set; }
+		public DateTime TimeStampUTC { get; set; }
+	}
 }
