@@ -41,8 +41,8 @@ namespace FW.BitX
 		private OrderBook GetOrderBookFromEndpoint(string url)
 		{
 			var restClient = new RestClient();
-			var restRepsonse = restClient.ExecuteRequest(url, null);
-			var payload = JsonConvert.DeserializeObject<BitX_OrderBook_QueryResponse>(restRepsonse.ResponseContent);
+			var restResponse = restClient.ExecuteRequest(url, null);
+			var payload = JsonConvert.DeserializeObject<BitX_OrderBook_QueryResponse>(restResponse.ResponseContent);
 			var result = new OrderBook
 			{
 				Currency = payload.currency,
@@ -79,8 +79,8 @@ namespace FW.BitX
 		private TradeInfo GetTradesFromUrl(string url)
 		{
 			var restClient = new RestClient();
-			var restRepsonse = restClient.ExecuteRequest(url, null);
-			var payload = JsonConvert.DeserializeObject<BitX_Trade_QueryResponse>(restRepsonse.ResponseContent);
+			var restResponse = restClient.ExecuteRequest(url, null);
+			var payload = JsonConvert.DeserializeObject<BitX_Trade_QueryResponse>(restResponse.ResponseContent);
 			var result = new TradeInfo
 			{
 				Currency = payload.currency,
