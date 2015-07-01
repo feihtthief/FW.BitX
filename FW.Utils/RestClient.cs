@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace FW.Utils
 {
+	// TODO: too specific for FW.Utils. Move into FW.BitX
 	public class RestClient
 	{
 		private string _Username;
