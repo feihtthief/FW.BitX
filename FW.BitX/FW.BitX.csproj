@@ -61,16 +61,13 @@
     <Compile Include="Entities\Remote\BitX_OrderBook_QueryResponse.cs" />
     <Compile Include="Entities\Remote\BitX_Transaction.cs" />
     <Compile Include="Entities\Remote\BitX_Transactions_QueryResponse.cs" />
+    <Compile Include="Logic\BitXUnixTime.cs" />
+    <Compile Include="Logic\RestClient.cs" />
+    <Compile Include="Logic\RestResponse.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\FW.Utils\FW.Utils.csproj">
-      <Project>{38c49af5-66f3-4f20-82c2-680a5bfa6be1}</Project>
-      <Name>FW.Utils</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,6 +1,6 @@
 ﻿using FW.BitX.Entities.Local;
 using FW.BitX.Entities.Remote;
-using FW.Utils;
+using FW.BitX.Logic;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -55,7 +55,7 @@ namespace FW.BitX
 			{
 				Currency = payload.currency,
 				BitXTimeStamp = payload.timestamp,
-				TimeStampUTC = UnixTime.FromUnixTimeUTC(payload.timestamp),
+				TimeStampUTC = BitXUnixTime.DateTimeUTCFromBitXUnixTime(payload.timestamp),
 			};
 			PopulateOrderBookEntries(result.Asks, payload.asks);
 			PopulateOrderBookEntries(result.Bids, payload.bids);
@@ -100,7 +100,7 @@ namespace FW.BitX
 					Price = Decimal.Parse(item.price),
 					Volume = Decimal.Parse(item.volume),
 					BitXTimeStamp = item.timestamp,
-					TimeStampUTC = UnixTime.FromUnixTimeUTC(item.timestamp),
+					TimeStampUTC = BitXUnixTime.DateTimeUTCFromBitXUnixTime(item.timestamp),
 				});
 			}
 			return result;
@@ -153,7 +153,7 @@ namespace FW.BitX
 				{
 					RowIndex = transaction.row_index,
 					BitXTimeStamp = transaction.timestamp,
-					TimeStampUTC = UnixTime.FromUnixTimeUTC(transaction.timestamp),
+					TimeStampUTC = BitXUnixTime.DateTimeUTCFromBitXUnixTime(transaction.timestamp),
 					Balance = (Decimal)transaction.balance,
 					Available = (Decimal)transaction.available,
 					BalanceDelta = (Decimal)transaction.balance_delta,

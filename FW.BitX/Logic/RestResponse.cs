@@ -5,9 +5,8 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FW.Utils
+namespace FW.BitX.Logic
 {
-	[Obsolete("Use FW.BitX.Logic.RestResponse")]
 	public class RestResponse
 	{
 		public HttpStatusCode StatusCode { get; set; }

@@ -4,15 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FW.Utils
+namespace FW.BitX.Logic
 {
-	// TODO: Some aspects are specific to BitX. move out of FW.Utils into FW.BitX
-	[Obsolete("Use FW.BitX.Logic.BitXUnixTime")]
-	public class UnixTime
+
+	public class BitXUnixTime
 	{
 		public static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
 
-		public static DateTime FromUnixTimeUTC(long unixtime)
+		public static DateTime DateTimeUTCFromBitXUnixTime(long unixtime)
 		{
 			var result = UnixEpoch.AddMilliseconds(unixtime);
 			return result;

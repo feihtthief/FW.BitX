@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,10 +6,8 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FW.Utils
+namespace FW.BitX.Logic
 {
-	// TODO: too specific for FW.Utils. Move into FW.BitX
-	[Obsolete("Use FW.BitX.Logic.RestClient")]
 	public class RestClient
 	{
 		private string _Username;
