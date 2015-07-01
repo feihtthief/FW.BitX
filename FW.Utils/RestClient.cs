@@ -41,17 +41,46 @@ namespace FW.Utils
 					string _cred = string.Format("{0} {1}", "Basic", _enc);
 					webReq.Headers[HttpRequestHeader.Authorization] = _cred;
 				}
-				var webResp = (HttpWebResponse)webReq.GetResponse();
-				var sr = new StreamReader(webResp.GetResponseStream());
-				var respString = sr.ReadToEnd();
-				result.StatusCode = webResp.StatusCode;
-				result.ResponseContent = respString;
+				var webResponse = (HttpWebResponse)webReq.GetResponse();
+				//////var sr = new StreamReader(webResp.GetResponseStream());
+				//////var respString = sr.ReadToEnd();
+				result.StatusCode = webResponse.StatusCode;
+				result.ResponseContent = GetResponseContentFromWebResponse(webResponse);
+				result.OK = result.StatusCode == HttpStatusCode.OK;
 			}
 			catch (Exception exc)
 			{
-				result.ResponseContent = String.Format("Exception: {0}", exc);
+				result.OK = false;
+				result.Exception = exc;
+				var webException = exc as WebException;// todo: implement all the way back to caller
+				if (webException != null)
+				{
+					var webResponse = webException.Response as HttpWebResponse;
+					if (webResponse != null)
+					{
+						result.ResponseContent = TryGetResponseContentFromWebResponse(webResponse);
+						result.StatusCode = webResponse.StatusCode;
+					}
+				}
 			}
 			return result;
+		}
+
+		internal string TryGetResponseContentFromWebResponse(WebResponse webResponse)
+		{
+			try
+			{
+				return GetResponseContentFromWebResponse(webResponse);
+			}
+			catch { }
+			return null;
+		}
+
+		internal string GetResponseContentFromWebResponse(WebResponse webResponse)
+		{
+			var sr = new StreamReader(webResponse.GetResponseStream());
+			var respString = sr.ReadToEnd();
+			return respString;
 		}
 	}
 }

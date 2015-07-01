@@ -29,6 +29,13 @@ namespace FW.BitX
 			this._ApiSecret = apiSecret;
 		}
 
+		public void Fail()
+		{
+			// todo: remove. testing only. WIP
+			var restClient = new RestClient();
+			var restResponse = restClient.ExecuteRequest("http://localhost/thereisnosuchfile", null);
+		}
+
 		public OrderBook GetOrderBookFromWeb()
 		{
 			return GetOrderBookFromEndpoint(BaseUrlWeb + "orderbook?pair=XBTZAR");
@@ -153,7 +160,6 @@ namespace FW.BitX
 					AvailableDelta = (Decimal)transaction.available_delta,
 					Currency = transaction.currency,
 					Description = transaction.description,
-
 				});
 			}
 			return result;

@@ -20,9 +20,11 @@ namespace FW.BitX.ManualTests
 		static void Main(string[] args)
 		{
 			TryLoadSettings();
+			var authorizedClient = new BitXClient(_ApiKey, _ApiSecret);
+			
+			authorizedClient.Fail();
 
-			var ac = new BitXClient(_ApiKey, _ApiSecret);
-			var balances = ac.GetBalances();
+			var balances = authorizedClient.GetBalances();
 
 			foreach (var balance in balances)
 			{
@@ -41,7 +43,7 @@ namespace FW.BitX.ManualTests
 			foreach (var balance in balances)
 			{
 				Console.WriteLine("=== Transactions for account id {0} ({1}) ===", balance.AccountID, balance.Asset);
-				var transactions = ac.GetTransactions(balance.AccountID, 1, 5);
+				var transactions = authorizedClient.GetTransactions(balance.AccountID, 1, 5);
 				foreach (var transaction in transactions)
 				{
 					Console.WriteLine("=== Transaction ===");

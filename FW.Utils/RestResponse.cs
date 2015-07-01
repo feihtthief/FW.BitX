@@ -11,5 +11,7 @@ namespace FW.Utils
 	{
 		public HttpStatusCode StatusCode { get; set; }
 		public string ResponseContent { get; set; }
+		public bool OK { get; set; }
+		public Exception Exception { get; set; }
 	}
 }
