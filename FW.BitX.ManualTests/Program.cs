@@ -21,20 +21,38 @@ namespace FW.BitX.ManualTests
 		{
 			TryLoadSettings();
 			var authorizedClient = new BitXClient(_ApiKey, _ApiSecret);
-			
-			authorizedClient.Fail();
+			var anonymousClient = new BitXClient();
+			DateTime startDT;
+			DateTime endDT;
+
+			var anon_TickerList_Api = anonymousClient.GetTickerList();
+			DumpTickerList(anon_TickerList_Api);
+			var authed_TickerList_Api = authorizedClient.GetTickerList();
+			DumpTickerList(authed_TickerList_Api);
+
+			if (Over()) return;
+			Console.WriteLine();
+
+			var anon_TickerInfo_Api = anonymousClient.GetTickerInfoFromApi();
+			DumpTickerInfo(anon_TickerInfo_Api);
+			var anon_TickerInfo_Web = anonymousClient.GetTickerInfoFromWeb();
+			DumpTickerInfo(anon_TickerInfo_Web);
+
+			var authed_TickerInfo_Api = authorizedClient.GetTickerInfoFromApi();
+			DumpTickerInfo(authed_TickerInfo_Api);
+			var authed_TickerInfo_Web = authorizedClient.GetTickerInfoFromWeb();
+			DumpTickerInfo(authed_TickerInfo_Web);
+
+			if (Over()) return;
+			Console.WriteLine();
+
+			authorizedClient.Fail(); // todo: remove. for testing only
 
 			var balances = authorizedClient.GetBalances();
 
 			foreach (var balance in balances)
 			{
-				Console.WriteLine("=== Balance ===");
-				Console.WriteLine("   AccountID : {0}", balance.AccountID);
-				Console.WriteLine("       Asset : {0}", balance.Asset);
-				Console.WriteLine("     Balance : {0}", balance.Balance);
-				Console.WriteLine("    Reserved : {0}", balance.Reserved);
-				Console.WriteLine(" Unconfirmed : {0}", balance.Unconfirmed);
-				Console.WriteLine("        Name : {0}", balance.Name);
+				DumpBalance(balance);
 			}
 
 			if (Over()) return;
@@ -42,42 +60,42 @@ namespace FW.BitX.ManualTests
 
 			foreach (var balance in balances)
 			{
-				Console.WriteLine("=== Transactions for account id {0} ({1}) ===", balance.AccountID, balance.Asset);
+				Console.WriteLine("=== (Top 5) Transactions for account id {0} ({1}) ===", balance.AccountID, balance.Asset);
 				var transactions = authorizedClient.GetTransactions(balance.AccountID, 1, 5);
 				foreach (var transaction in transactions)
 				{
-					Console.WriteLine("=== Transaction ===");
-					Console.WriteLine("        RowIndex : {0}", transaction.RowIndex);
-					Console.WriteLine("       Available : {0}", transaction.Available);
-					Console.WriteLine(" Available Delta : {0}", transaction.AvailableDelta);
-					Console.WriteLine("         Balance : {0}", transaction.Balance);
-					Console.WriteLine("   Balance Delta : {0}", transaction.BalanceDelta);
-					Console.WriteLine("        Currency : {0}", transaction.Currency);
-					Console.WriteLine("     Description : {0}", transaction.Description);
-					Console.WriteLine("   BitXTimeStamp : {0}", transaction.BitXTimeStamp);
-					Console.WriteLine("    TimeStampUTC : {0}", transaction.TimeStampUTC);
+					DumpTransaction(transaction);
 				}
 			}
 
 			if (Over()) return;
 			Console.WriteLine();
 
-			var c = new BitXClient();
-			DateTime startDT;
-			DateTime endDT;
+			var orderbook = anonymousClient.GetOrderBookFromApi();
+			var sb = new StringBuilder();
+			sb.AppendFormat("{0},{1},{2}", "Type", "Price", "Volume");
+			sb.AppendLine();
+			foreach (var item in orderbook.Asks)
+			{
+				sb.AppendFormat("{0},{1},{2}", "ASK", item.Price, item.Volume);
+				sb.AppendLine();
+			}
+			foreach (var item in orderbook.Bids)
+			{
+				sb.AppendFormat("{0},{1},{2}", "BID", item.Price, item.Volume);
+				sb.AppendLine();
+			}
+			File.WriteAllText(@"d:\temp\bitx\orderbook.csv", sb.ToString());
 
-			var orderbook_A = c.GetOrderBookFromApi();
-			Console.WriteLine("Asks: {0}", orderbook_A.Asks.Count());
-			Console.WriteLine("Bids: {0}", orderbook_A.Bids.Count());
-			Console.WriteLine("BitXTimeStamp: {0}", orderbook_A.BitXTimeStamp);
-			Console.WriteLine("TimeStampUTC: {0}", orderbook_A.TimeStampUTC);
+			if (Over()) return;
 			Console.WriteLine();
 
-			var orderbook_W = c.GetOrderBookFromWeb();
-			Console.WriteLine("Asks: {0}", orderbook_W.Asks.Count());
-			Console.WriteLine("Bids: {0}", orderbook_W.Bids.Count());
-			Console.WriteLine("BitXTimeStamp: {0}", orderbook_W.BitXTimeStamp);
-			Console.WriteLine("TimeStampUTC: {0}", orderbook_W.TimeStampUTC);
+			var orderbook_A = anonymousClient.GetOrderBookFromApi();
+			DumpOrderBook(orderbook_A);
+			Console.WriteLine();
+
+			var orderbook_W = anonymousClient.GetOrderBookFromWeb();
+			DumpOrderBook(orderbook_W);
 			Console.WriteLine();
 
 			foreach (var ask in orderbook_W.Asks)
@@ -93,7 +111,7 @@ namespace FW.BitX.ManualTests
 			Console.WriteLine();
 
 			startDT = DateTime.Now;
-			var ti_A = c.GetTradesFromApi();
+			var ti_A = anonymousClient.GetTradesFromApi();
 			endDT = DateTime.Now;
 
 			Console.WriteLine(ti_A.Trades.Count());
@@ -106,7 +124,7 @@ namespace FW.BitX.ManualTests
 			//}
 
 			startDT = DateTime.Now;
-			var ti_W = c.GetTradesFromWeb();
+			var ti_W = anonymousClient.GetTradesFromWeb();
 			endDT = DateTime.Now;
 
 			Console.WriteLine(ti_W.Trades.Count());
@@ -154,6 +172,63 @@ namespace FW.BitX.ManualTests
 			//////var resp = JsonConvert.DeserializeObject<BitX_TradeQueryResponse>(respString);
 			//////Console.WriteLine(resp.trades.Count());
 
+		}
+
+		private static void DumpTickerList(Entities.Local.TickerList tickerList)
+		{
+			Console.WriteLine("===== Ticker List =====");
+			Console.WriteLine();
+			foreach (var ticker in tickerList.Tickers)
+			{
+				Console.WriteLine(" ==== Ticker info for Pair: {0} ====", ticker.Pair);
+				DumpTickerInfo(ticker,"  ");
+				Console.WriteLine();
+			}
+		}
+
+		private static void DumpOrderBook(Entities.Local.OrderBook orderbook_A)
+		{
+			Console.WriteLine("=== Order Book ===");
+			Console.WriteLine("Asks: {0}", orderbook_A.Asks.Count());
+			Console.WriteLine("Bids: {0}", orderbook_A.Bids.Count());
+			Console.WriteLine("BitXTimeStamp: {0}", orderbook_A.BitXTimeStamp);
+			Console.WriteLine("TimeStampUTC: {0}", orderbook_A.TimeStampUTC);
+		}
+
+		private static void DumpTransaction(Entities.Local.TransactionEntry transaction)
+		{
+			Console.WriteLine("=== Transaction ===");
+			Console.WriteLine("        RowIndex : {0}", transaction.RowIndex);
+			Console.WriteLine("       Available : {0}", transaction.Available);
+			Console.WriteLine(" Available Delta : {0}", transaction.AvailableDelta);
+			Console.WriteLine("         Balance : {0}", transaction.Balance);
+			Console.WriteLine("   Balance Delta : {0}", transaction.BalanceDelta);
+			Console.WriteLine("        Currency : {0}", transaction.Currency);
+			Console.WriteLine("     Description : {0}", transaction.Description);
+			Console.WriteLine("   BitXTimeStamp : {0}", transaction.BitXTimeStamp);
+			Console.WriteLine("    TimeStampUTC : {0}", transaction.TimeStampUTC);
+		}
+
+		private static void DumpBalance(Entities.Local.AccountBalance balance)
+		{
+			Console.WriteLine("=== Balance ===");
+			Console.WriteLine("   AccountID : {0}", balance.AccountID);
+			Console.WriteLine("       Asset : {0}", balance.Asset);
+			Console.WriteLine("     Balance : {0}", balance.Balance);
+			Console.WriteLine("    Reserved : {0}", balance.Reserved);
+			Console.WriteLine(" Unconfirmed : {0}", balance.Unconfirmed);
+			Console.WriteLine("        Name : {0}", balance.Name);
+		}
+
+		private static void DumpTickerInfo(Entities.Local.TickerInfo tickerInfo, string headerPrefix = "")
+		{
+			Console.WriteLine("{0}=== Ticker Info ===", headerPrefix);
+			Console.WriteLine("                 Ask : {0}", tickerInfo.Ask);
+			Console.WriteLine("                 Bid : {0}", tickerInfo.Bid);
+			Console.WriteLine("           LastTrade : {0}", tickerInfo.LastTrade);
+			Console.WriteLine("        TimeStampUTC : {0}", tickerInfo.TimeStampUTC);
+			Console.WriteLine("       BitXTimeStamp : {0}", tickerInfo.BitXTimeStamp);
+			Console.WriteLine(" Rolling24HourVolume : {0}", tickerInfo.Rolling24HourVolume);
 		}
 
 		private static bool Over()

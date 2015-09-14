@@ -36,6 +36,82 @@ namespace FW.BitX
 			var restResponse = restClient.ExecuteRequest("http://localhost/thereisnosuchfile", null);
 		}
 
+		// todo: rework all of these to return encapsulated response object to allow the calling app to know that the web server response code was a throttle response (503)
+		// todo: implement PAIRS enum
+
+		// todo: tickers
+		// done: ticker(pair)
+		// todo: accounts
+		// todo: pending transactions
+		// todo: list orders
+		// todo: post order
+		// todo: stop order
+		// todo: get order?
+
+		public TickerList GetTickerList()
+		{
+			return GetTickerListFromEndPoint(BaseUrlApi + "tickers");
+		}
+
+		private TickerList GetTickerListFromEndPoint(string url)
+		{
+			var restClient = new RestClient();
+			var restResponse = restClient.ExecuteRequest(url, null);
+			var payload = JsonConvert.DeserializeObject<BitX_AllTickers_QueryResponse>(restResponse.ResponseContent);
+			var result = new TickerList
+			{
+				Tickers = new List<TickerListEntry>()
+			};
+			PopulateTickerListEntries(result.Tickers, payload.tickers);
+			return result;
+		}
+
+		private void PopulateTickerListEntries(List<TickerListEntry> list, BitX_AllTickers_TickerEntry[] entries)
+		{
+			foreach (var item in entries)
+			{
+				list.Add(
+					new TickerListEntry
+					{
+						BitXTimeStamp = item.timestamp,
+						TimeStampUTC = BitXUnixTime.DateTimeUTCFromBitXUnixTime(item.timestamp),
+						Ask = Decimal.Parse(item.ask),
+						Bid = Decimal.Parse(item.bid),
+						LastTrade = Decimal.Parse(item.last_trade),
+						Rolling24HourVolume = Decimal.Parse(item.rolling_24_hour_volume),
+						Pair = item.pair,
+					}
+				);
+			}
+		}
+
+		public TickerInfo GetTickerInfoFromWeb()
+		{
+			return GetTickerInfoFromEndPoint(BaseUrlWeb + "ticker?pair=XBTZAR");
+		}
+
+		public TickerInfo GetTickerInfoFromApi()
+		{
+			return GetTickerInfoFromEndPoint(BaseUrlApi + "ticker?pair=XBTZAR");
+		}
+
+		private TickerInfo GetTickerInfoFromEndPoint(string url)
+		{
+			var restClient = new RestClient();
+			var restResponse = restClient.ExecuteRequest(url, null);
+			var payload = JsonConvert.DeserializeObject<BitX_Ticker_QueryResponse>(restResponse.ResponseContent);
+			var result = new TickerInfo
+			{
+				BitXTimeStamp = payload.timestamp,
+				TimeStampUTC = BitXUnixTime.DateTimeUTCFromBitXUnixTime(payload.timestamp),
+				Ask = Decimal.Parse(payload.ask),
+				Bid = Decimal.Parse(payload.bid),
+				LastTrade = Decimal.Parse(payload.last_trade),
+				Rolling24HourVolume = Decimal.Parse(payload.rolling_24_hour_volume),
+			};
+			return result;
+		}
+
 		public OrderBook GetOrderBookFromWeb()
 		{
 			return GetOrderBookFromEndpoint(BaseUrlWeb + "orderbook?pair=XBTZAR");
