@@ -48,18 +48,23 @@ namespace FW.BitX
 
 		private OrderBook GetOrderBookFromEndpoint(string url)
 		{
-			var restClient = new RestClient();
-			var restResponse = restClient.ExecuteRequest(url, null);
-			var payload = JsonConvert.DeserializeObject<BitX_OrderBook_QueryResponse>(restResponse.ResponseContent);
-			var result = new OrderBook
+			//var restClient = new RestClient();
+			//var restResponse = restClient.ExecuteRequest(url, null);
+			//var payload = JsonConvert.DeserializeObject<BitX_OrderBook_QueryResponse>(restResponse.ResponseContent);
+			BitX_OrderBook_QueryResponse payload;
+			if (GetPayloadAnonymous(out payload, url))
 			{
-				Currency = payload.currency,
-				BitXTimeStamp = payload.timestamp,
-				TimeStampUTC = BitXUnixTime.DateTimeUTCFromBitXUnixTime(payload.timestamp),
-			};
-			PopulateOrderBookEntries(result.Asks, payload.asks);
-			PopulateOrderBookEntries(result.Bids, payload.bids);
-			return result;
+				var result = new OrderBook
+				{
+					Currency = payload.currency,
+					BitXTimeStamp = payload.timestamp,
+					TimeStampUTC = BitXUnixTime.DateTimeUTCFromBitXUnixTime(payload.timestamp),
+				};
+				PopulateOrderBookEntries(result.Asks, payload.asks);
+				PopulateOrderBookEntries(result.Bids, payload.bids);
+				return result;
+			}
+			return null;
 		}
 
 		private void PopulateOrderBookEntries(List<OrderBookEntry> list, BitX_OrderBookEntry[] entries)
@@ -86,24 +91,29 @@ namespace FW.BitX
 
 		private TradeInfo GetTradesFromUrl(string url)
 		{
-			var restClient = new RestClient();
-			var restResponse = restClient.ExecuteRequest(url, null);
-			var payload = JsonConvert.DeserializeObject<BitX_Trade_QueryResponse>(restResponse.ResponseContent);
-			var result = new TradeInfo
+			//var restClient = new RestClient();
+			//var restResponse = restClient.ExecuteRequest(url, null);
+			//var payload = JsonConvert.DeserializeObject<BitX_Trade_QueryResponse>(restResponse.ResponseContent);
+			BitX_Trade_QueryResponse payload;
+			if (GetPayloadAnonymous(out payload, url))
 			{
-				Currency = payload.currency,
-			};
-			foreach (var item in payload.trades)
-			{
-				result.Trades.Add(new Trade
+				var result = new TradeInfo
 				{
-					Price = Decimal.Parse(item.price),
-					Volume = Decimal.Parse(item.volume),
-					BitXTimeStamp = item.timestamp,
-					TimeStampUTC = BitXUnixTime.DateTimeUTCFromBitXUnixTime(item.timestamp),
-				});
+					Currency = payload.currency,
+				};
+				foreach (var item in payload.trades)
+				{
+					result.Trades.Add(new Trade
+					{
+						Price = Decimal.Parse(item.price),
+						Volume = Decimal.Parse(item.volume),
+						BitXTimeStamp = item.timestamp,
+						TimeStampUTC = BitXUnixTime.DateTimeUTCFromBitXUnixTime(item.timestamp),
+					});
+				}
+				return result;
 			}
-			return result;
+			return null;
 		}
 
 		public List<AccountBalance> GetBalances()
@@ -113,23 +123,28 @@ namespace FW.BitX
 
 		private List<AccountBalance> GetBalancesFromUrl(string url)
 		{
-			var restClient = new RestClient(_ApiKey, _ApiSecret);
-			var restResponse = restClient.ExecuteRequest(url, null);
-			var payload = JsonConvert.DeserializeObject<BitX_Balances_QueryResponse>(restResponse.ResponseContent);
-			var result = new List<AccountBalance>();
-			foreach (var balance in payload.balance)
+			//var restClient = new RestClient(_ApiKey, _ApiSecret);
+			//var restResponse = restClient.ExecuteRequest(url, null);
+			//var payload = JsonConvert.DeserializeObject<BitX_Balances_QueryResponse>(restResponse.ResponseContent);
+			BitX_Balances_QueryResponse payload;
+			if (GetPayloadAuthenticated(out payload, url))
 			{
-				result.Add(new AccountBalance
+				var result = new List<AccountBalance>();
+				foreach (var balance in payload.balance)
 				{
-					AccountID = balance.account_id,
-					Asset = balance.asset,
-					Name = balance.name,
-					Balance = Decimal.Parse(balance.balance),
-					Reserved = Decimal.Parse(balance.reserved),
-					Unconfirmed = Decimal.Parse(balance.unconfirmed),
-				});
+					result.Add(new AccountBalance
+					{
+						AccountID = balance.account_id,
+						Asset = balance.asset,
+						Name = balance.name,
+						Balance = Decimal.Parse(balance.balance),
+						Reserved = Decimal.Parse(balance.reserved),
+						Unconfirmed = Decimal.Parse(balance.unconfirmed),
+					});
+				}
+				return result;
 			}
-			return result;
+			return null;
 		}
 
 		public List<TransactionEntry> GetTransactions(string accountID, int minRow, int maxRow)
@@ -143,26 +158,60 @@ namespace FW.BitX
 
 		private List<TransactionEntry> GetTransactionsFromUrl(string url)
 		{
-			var restClient = new RestClient(_ApiKey, _ApiSecret);
-			var restResponse = restClient.ExecuteRequest(url, null);
-			var payload = JsonConvert.DeserializeObject<BitX_Transactions_QueryResponse>(restResponse.ResponseContent);
-			var result = new List<TransactionEntry>();
-			foreach (var transaction in payload.transactions)
+			//var restClient = new RestClient(_ApiKey, _ApiSecret);
+			//var restResponse = restClient.ExecuteRequest(url, null);
+			//var payload = JsonConvert.DeserializeObject<BitX_Transactions_QueryResponse>(restResponse.ResponseContent);
+			BitX_Transactions_QueryResponse payload;
+			if (GetPayloadAuthenticated(out payload, url))
 			{
-				result.Add(new TransactionEntry
+				var result = new List<TransactionEntry>();
+				foreach (var transaction in payload.transactions)
 				{
-					RowIndex = transaction.row_index,
-					BitXTimeStamp = transaction.timestamp,
-					TimeStampUTC = BitXUnixTime.DateTimeUTCFromBitXUnixTime(transaction.timestamp),
-					Balance = (Decimal)transaction.balance,
-					Available = (Decimal)transaction.available,
-					BalanceDelta = (Decimal)transaction.balance_delta,
-					AvailableDelta = (Decimal)transaction.available_delta,
-					Currency = transaction.currency,
-					Description = transaction.description,
-				});
+					result.Add(new TransactionEntry
+					{
+						RowIndex = transaction.row_index,
+						BitXTimeStamp = transaction.timestamp,
+						TimeStampUTC = BitXUnixTime.DateTimeUTCFromBitXUnixTime(transaction.timestamp),
+						Balance = (Decimal)transaction.balance,
+						Available = (Decimal)transaction.available,
+						BalanceDelta = (Decimal)transaction.balance_delta,
+						AvailableDelta = (Decimal)transaction.available_delta,
+						Currency = transaction.currency,
+						Description = transaction.description,
+					});
+				}
+				return result;
 			}
-			return result;
+			return null;
 		}
+
+		private bool GetPayloadAnonymous<T>(out T payload, string url)
+			where T : class
+		{
+			var restClient = new RestClient();
+			return __GetPayload<T>(out payload, restClient, url);
+		}
+
+		private bool GetPayloadAuthenticated<T>(out T payload, string url)
+			where T : class
+		{
+			var restClient = new RestClient(_ApiKey, _ApiSecret);
+			return __GetPayload<T>(out payload, restClient, url);
+		}
+
+		// Prefixed with __ to help hint at the fact that this is not meant to be called directly, but rather through one of the other method
+		private bool __GetPayload<T>(out T payload, RestClient restClient, string url)
+			where T : class
+		{
+			payload = null;
+			var restResponse = restClient.ExecuteRequest(url, null);
+			if (restResponse.OK)
+			{
+				payload = JsonConvert.DeserializeObject<T>(restResponse.ResponseContent);
+				return true;
+			}
+			return false;
+		}
+
 	}
 }

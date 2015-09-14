@@ -32,8 +32,6 @@ namespace FW.BitX.Logic
 					|| (!string.IsNullOrWhiteSpace(_Password))
 					)
 				{
-					//webReq.PreAuthenticate = true;
-					//webReq.Credentials = new NetworkCredential(_Username, _Password);
 					// === !!! mrh? Works, but not ideal !!! too tired , too late in the night ===
 					string _auth = string.Format("{0}:{1}", _Username, _Password);
 					string _enc = Convert.ToBase64String(Encoding.ASCII.GetBytes(_auth));
@@ -41,8 +39,6 @@ namespace FW.BitX.Logic
 					webReq.Headers[HttpRequestHeader.Authorization] = _cred;
 				}
 				var webResponse = (HttpWebResponse)webReq.GetResponse();
-				//////var sr = new StreamReader(webResp.GetResponseStream());
-				//////var respString = sr.ReadToEnd();
 				result.StatusCode = webResponse.StatusCode;
 				result.ResponseContent = GetResponseContentFromWebResponse(webResponse);
 				result.OK = result.StatusCode == HttpStatusCode.OK;
