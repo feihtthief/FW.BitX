@@ -74,7 +74,9 @@ namespace FW.BitX.TestApp
 		{
 			var client = new BitXClient();
 			var tradeInfo = client.GetTradesFromApi();
-			PopulateListView(lvTrades, tradeInfo.Trades, TradeMap);
+			if (tradeInfo.OK) { 
+				PopulateListView(lvTrades, tradeInfo.PayloadResponse.Trades, TradeMap);
+			}
 			//lvTrades.BeginUpdate();
 			//try
 			//{

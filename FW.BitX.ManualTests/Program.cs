@@ -14,34 +14,77 @@ namespace FW.BitX.ManualTests
 	class Program
 	{
 		private static readonly string NL = Environment.NewLine;
-		private static string _ApiKey = null;
-		private static string _ApiSecret = null;
+		private static Settings _Settings = null;
 
 		static void Main(string[] args)
 		{
 			TryLoadSettings();
-			var authorizedClient = new BitXClient(_ApiKey, _ApiSecret);
+			var authorizedClient = new BitXClient(_Settings.ApiKey, _Settings.ApiSecret);
 			var anonymousClient = new BitXClient();
 			DateTime startDT;
 			DateTime endDT;
 
-			var anon_TickerList_Api = anonymousClient.GetTickerList();
-			DumpTickerList(anon_TickerList_Api);
-			var authed_TickerList_Api = authorizedClient.GetTickerList();
-			DumpTickerList(authed_TickerList_Api);
+			//var BuyOrderResponse = authorizedClient.GetTransactions();
+
+			var anon_TickerList_ViaApi = anonymousClient.GetTickerList();
+			if (anon_TickerList_ViaApi.OK)
+			{
+				DumpTickerList(anon_TickerList_ViaApi.PayloadResponse);
+			}
+			else
+			{
+				Console.WriteLine("Anonymous GetTickerList via API Failed: {0}", anon_TickerList_ViaApi);
+			}
+			var authed_TickerList_ViaApi = authorizedClient.GetTickerList();
+			if (authed_TickerList_ViaApi.OK)
+			{
+				DumpTickerList(authed_TickerList_ViaApi.PayloadResponse);
+			}
+			else
+			{
+				Console.WriteLine("Authenticated GetTickerList via API Failed: {0}", authed_TickerList_ViaApi);
+			}
 
 			if (Over()) return;
 			Console.WriteLine();
 
-			var anon_TickerInfo_Api = anonymousClient.GetTickerInfoFromApi();
-			DumpTickerInfo(anon_TickerInfo_Api);
-			var anon_TickerInfo_Web = anonymousClient.GetTickerInfoFromWeb();
-			DumpTickerInfo(anon_TickerInfo_Web);
+			var anon_TickerInfo_ViaApi = anonymousClient.GetTickerInfoFromApi();
+			if (anon_TickerInfo_ViaApi.OK)
+			{
+				DumpTickerInfo(anon_TickerInfo_ViaApi.PayloadResponse);
+			}
+			else
+			{
+				Console.WriteLine("Anonymous GetTickerInfo via API Failed: {0}", anon_TickerInfo_ViaApi);
+			}
+			var anon_TickerInfo_ViaWeb = anonymousClient.GetTickerInfoFromWeb();
+			if (anon_TickerInfo_ViaWeb.OK)
+			{
+				DumpTickerInfo(anon_TickerInfo_ViaWeb.PayloadResponse);
+			}
+			else
+			{
+				Console.WriteLine("Anonymous GetTickerInfo via WEB Failed: {0}", anon_TickerInfo_ViaWeb);
+			}
 
-			var authed_TickerInfo_Api = authorizedClient.GetTickerInfoFromApi();
-			DumpTickerInfo(authed_TickerInfo_Api);
-			var authed_TickerInfo_Web = authorizedClient.GetTickerInfoFromWeb();
-			DumpTickerInfo(authed_TickerInfo_Web);
+			var authed_TickerInfo_ViaApi = authorizedClient.GetTickerInfoFromApi();
+			if (authed_TickerInfo_ViaApi.OK)
+			{
+				DumpTickerInfo(authed_TickerInfo_ViaApi.PayloadResponse);
+			}
+			else
+			{
+				Console.WriteLine("Authenticated GetTickerInfo via API Failed: {0}", authed_TickerInfo_ViaApi);
+			}
+			var authed_TickerInfo_ViaWeb = authorizedClient.GetTickerInfoFromWeb();
+			if (authed_TickerInfo_ViaWeb.OK)
+			{
+				DumpTickerInfo(authed_TickerInfo_ViaWeb.PayloadResponse);
+			}
+			else
+			{
+				Console.WriteLine("Authenticated GetTickerInfo via WEB Failed: {0}", authed_TickerInfo_ViaWeb);
+			}
 
 			if (Over()) return;
 			Console.WriteLine();
@@ -49,62 +92,110 @@ namespace FW.BitX.ManualTests
 			authorizedClient.Fail(); // todo: remove. for testing only
 
 			var balances = authorizedClient.GetBalances();
-
-			foreach (var balance in balances)
+			if (balances.OK)
 			{
-				DumpBalance(balance);
-			}
-
-			if (Over()) return;
-			Console.WriteLine();
-
-			foreach (var balance in balances)
-			{
-				Console.WriteLine("=== (Top 5) Transactions for account id {0} ({1}) ===", balance.AccountID, balance.Asset);
-				var transactions = authorizedClient.GetTransactions(balance.AccountID, 1, 5);
-				foreach (var transaction in transactions)
+				foreach (var balance in balances.PayloadResponse)
 				{
-					DumpTransaction(transaction);
+					DumpBalance(balance);
 				}
+
+				if (Over()) return;
+				Console.WriteLine();
+
+				foreach (var balance in balances.PayloadResponse)
+				{
+					Console.WriteLine("=== (Top 5) Transactions for account id {0} ({1}) ===", balance.AccountID, balance.Asset);
+					var transactions = authorizedClient.GetTransactions(balance.AccountID, 1, 5);
+					if (transactions.OK)
+					{
+						foreach (var transaction in transactions.PayloadResponse)
+						{
+							DumpTransaction(transaction);
+						}
+					}
+					else
+					{
+						Console.WriteLine("Authenticated GetTransactions via API Failed: {0}", transactions);
+					}
+					Console.WriteLine("=== Pending Transactions for account id {0} ({1}) ===", balance.AccountID, balance.Asset);
+					var pendingTransactions = authorizedClient.GetPendingTransactions(balance.AccountID);
+					if (pendingTransactions.OK)
+					{
+						foreach (var pendingTransaction in pendingTransactions.PayloadResponse)
+						{
+							DumpPendingTransaction(pendingTransaction);
+						}
+					}
+					else
+					{
+						Console.WriteLine("Authenticated GetPendingTransactions via API Failed: {0}", pendingTransactions);
+					}
+				}
+			}
+			else
+			{
+				Console.WriteLine("Authenticated GetBalances via API Failed: {0}", balances);
 			}
 
 			if (Over()) return;
 			Console.WriteLine();
 
 			var orderbook = anonymousClient.GetOrderBookFromApi();
-			var sb = new StringBuilder();
-			sb.AppendFormat("{0},{1},{2}", "Type", "Price", "Volume");
-			sb.AppendLine();
-			foreach (var item in orderbook.Asks)
+			if (orderbook.OK)
 			{
-				sb.AppendFormat("{0},{1},{2}", "ASK", item.Price, item.Volume);
+				var sb = new StringBuilder();
+				sb.AppendFormat("{0},{1},{2}", "Type", "Price", "Volume");
 				sb.AppendLine();
+				foreach (var item in orderbook.PayloadResponse.Asks)
+				{
+					sb.AppendFormat("{0},{1},{2}", "ASK", item.Price, item.Volume);
+					sb.AppendLine();
+				}
+				foreach (var item in orderbook.PayloadResponse.Bids)
+				{
+					sb.AppendFormat("{0},{1},{2}", "BID", item.Price, item.Volume);
+					sb.AppendLine();
+				}
+				File.WriteAllText(@"d:\temp\bitx\orderbook.csv", sb.ToString());
+				Console.WriteLine("OrderBook Dumped to File.");
 			}
-			foreach (var item in orderbook.Bids)
+			else
 			{
-				sb.AppendFormat("{0},{1},{2}", "BID", item.Price, item.Volume);
-				sb.AppendLine();
+				Console.WriteLine("Anonymous GetOrderBookFromApi via API Failed: {0}", orderbook);
 			}
-			File.WriteAllText(@"d:\temp\bitx\orderbook.csv", sb.ToString());
 
 			if (Over()) return;
 			Console.WriteLine();
 
-			var orderbook_A = anonymousClient.GetOrderBookFromApi();
-			DumpOrderBook(orderbook_A);
-			Console.WriteLine();
-
-			var orderbook_W = anonymousClient.GetOrderBookFromWeb();
-			DumpOrderBook(orderbook_W);
-			Console.WriteLine();
-
-			foreach (var ask in orderbook_W.Asks)
+			var orderbook_ViaApi = anonymousClient.GetOrderBookFromApi();
+			if (orderbook_ViaApi.OK)
 			{
-				Console.WriteLine("A,{0},{1}", ask.Price, ask.Volume);
+				DumpOrderBook(orderbook_ViaApi.PayloadResponse);
 			}
-			foreach (var bid in orderbook_W.Bids)
+			else
 			{
-				Console.WriteLine("B,{0},{1}", bid.Price, bid.Volume);
+				Console.WriteLine("Anonymous GetOrderBook via API Failed: {0}", orderbook_ViaApi);
+			}
+			Console.WriteLine();
+
+			var orderbook_ViaWeb = anonymousClient.GetOrderBookFromWeb();
+			if (orderbook_ViaWeb.OK)
+			{
+				DumpOrderBook(orderbook_ViaWeb.PayloadResponse);
+				Console.WriteLine();
+
+				foreach (var ask in orderbook_ViaWeb.PayloadResponse.Asks)
+				{
+					Console.WriteLine("ASK,{0},{1}", ask.Price, ask.Volume);
+				}
+				foreach (var bid in orderbook_ViaWeb.PayloadResponse.Bids)
+				{
+					Console.WriteLine("BID,{0},{1}", bid.Price, bid.Volume);
+				}
+			}
+			else
+			{
+				Console.WriteLine("Anonymous GetOrderBook via WEB Failed: {0}", orderbook_ViaWeb);
 			}
 
 			if (Over()) return;
@@ -113,8 +204,14 @@ namespace FW.BitX.ManualTests
 			startDT = DateTime.Now;
 			var ti_A = anonymousClient.GetTradesFromApi();
 			endDT = DateTime.Now;
-
-			Console.WriteLine(ti_A.Trades.Count());
+			if (ti_A.OK)
+			{
+				Console.WriteLine(ti_A.PayloadResponse.Trades.Count());
+			}
+			else
+			{
+				Console.WriteLine("Anonymous GetTrades via API Failed: {0}", ti_A);
+			}
 			Console.WriteLine(endDT - startDT);
 			Console.WriteLine();
 
@@ -127,7 +224,14 @@ namespace FW.BitX.ManualTests
 			var ti_W = anonymousClient.GetTradesFromWeb();
 			endDT = DateTime.Now;
 
-			Console.WriteLine(ti_W.Trades.Count());
+			if (ti_W.OK)
+			{
+				Console.WriteLine(ti_W.PayloadResponse.Trades.Count());
+			}
+			else
+			{
+				Console.WriteLine("Anonymous GetTrades via Web Failed: {0}", ti_W);
+			}
 			Console.WriteLine(endDT - startDT);
 			Console.WriteLine();
 
@@ -136,33 +240,36 @@ namespace FW.BitX.ManualTests
 			//    Console.WriteLine("{0,-20} | {1,20:n8} | {2,20} | {3,20:n8}", item.TimeStamp, item.Volume, item.Price, item.Volume * item.Price);
 			//}
 
-			if (ti_A.Trades.Count() != ti_W.Trades.Count())
+			if ((ti_A.OK) && (ti_W.OK))
 			{
-				Console.WriteLine("Count Mismatch");
-			}
-			var sameCount = 0;
-			var diffCount = 0;
-			for (int i = 0; i < Math.Min(ti_A.Trades.Count(), ti_W.Trades.Count()); i++)
-			{
-				var a = ti_A.Trades[i];
-				var b = ti_W.Trades[i];
-				var areSame = true
-					&& (a.Price == b.Price)
-					&& (a.TimeStampUTC == b.TimeStampUTC)
-					&& (a.TimeStampUTC == b.TimeStampUTC)
-					;
-				if (areSame)
+				if (ti_A.PayloadResponse.Trades.Count() != ti_W.PayloadResponse.Trades.Count())
 				{
-					sameCount++;
+					Console.WriteLine("Count Mismatch");
 				}
-				else
+				var sameCount = 0;
+				var diffCount = 0;
+				for (int i = 0; i < Math.Min(ti_A.PayloadResponse.Trades.Count(), ti_W.PayloadResponse.Trades.Count()); i++)
 				{
-					diffCount++;
+					var a = ti_A.PayloadResponse.Trades[i];
+					var b = ti_W.PayloadResponse.Trades[i];
+					var areSame = true
+						&& (a.Price == b.Price)
+						&& (a.TimeStampUTC == b.TimeStampUTC)
+						&& (a.TimeStampUTC == b.TimeStampUTC)
+						;
+					if (areSame)
+					{
+						sameCount++;
+					}
+					else
+					{
+						diffCount++;
+					}
 				}
+				Console.WriteLine("Same Count: {0}", sameCount);
+				Console.WriteLine("Diff Count: {0}", diffCount);
+				Console.WriteLine();
 			}
-			Console.WriteLine("Same Count: {0}", sameCount);
-			Console.WriteLine("Diff Count: {0}", diffCount);
-			Console.WriteLine();
 
 			//////var webReq = WebRequest.Create("https://api.mybitx.com/api/1/trades?pair=XBTZAR");
 			//////var webResp = webReq.GetResponse();
@@ -172,6 +279,22 @@ namespace FW.BitX.ManualTests
 			//////var resp = JsonConvert.DeserializeObject<BitX_TradeQueryResponse>(respString);
 			//////Console.WriteLine(resp.trades.Count());
 
+			Console.WriteLine("End of the line");
+			Console.ReadKey(true);
+
+		}
+
+		private static void DumpPendingTransaction(Entities.Local.PendingTransactionEntry pendingTransaction)
+		{
+			Console.WriteLine("=== Pending Transaction ===");
+			Console.WriteLine("       Available : {0}", pendingTransaction.Available);
+			Console.WriteLine(" Available Delta : {0}", pendingTransaction.AvailableDelta);
+			Console.WriteLine("         Balance : {0}", pendingTransaction.Balance);
+			Console.WriteLine("   Balance Delta : {0}", pendingTransaction.BalanceDelta);
+			Console.WriteLine("        Currency : {0}", pendingTransaction.Currency);
+			Console.WriteLine("     Description : {0}", pendingTransaction.Description);
+			Console.WriteLine("   BitXTimeStamp : {0}", pendingTransaction.BitXTimeStamp);
+			Console.WriteLine("    TimeStampUTC : {0}", pendingTransaction.TimeStampUTC);
 		}
 
 		private static void DumpTickerList(Entities.Local.TickerList tickerList)
@@ -181,7 +304,7 @@ namespace FW.BitX.ManualTests
 			foreach (var ticker in tickerList.Tickers)
 			{
 				Console.WriteLine(" ==== Ticker info for Pair: {0} ====", ticker.Pair);
-				DumpTickerInfo(ticker,"  ");
+				DumpTickerInfo(ticker, "  ");
 				Console.WriteLine();
 			}
 		}
@@ -242,12 +365,7 @@ namespace FW.BitX.ManualTests
 		{
 			try
 			{
-				var settings = JsonConvert.DeserializeObject<Settings>(File.ReadAllText(@"c:\Configs\BitX\settings.json"));
-				if (settings != null)
-				{
-					_ApiKey = settings.ApiKey ?? "";
-					_ApiSecret = settings.ApiSecret ?? "";
-				}
+				_Settings = JsonConvert.DeserializeObject<Settings>(File.ReadAllText(@"c:\Configs\BitX\settings.json"));
 			}
 			catch (Exception exc)
 			{

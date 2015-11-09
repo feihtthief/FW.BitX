@@ -48,21 +48,25 @@ namespace FW.BitX
 		// todo: stop order
 		// todo: get order?
 
-		public TickerList GetTickerList()
+		public ResponseWrapper<TickerList> GetTickerList()
 		{
 			return GetTickerListFromEndPoint(BaseUrlApi + "tickers");
 		}
 
-		private TickerList GetTickerListFromEndPoint(string url)
+		private ResponseWrapper<TickerList> GetTickerListFromEndPoint(string url)
 		{
 			var restClient = new RestClient();
 			var restResponse = restClient.ExecuteRequest(url, null);
-			var payload = JsonConvert.DeserializeObject<BitX_AllTickers_QueryResponse>(restResponse.ResponseContent);
-			var result = new TickerList
+			var result = new ResponseWrapper<TickerList>(restResponse, (responseContent) =>
 			{
-				Tickers = new List<TickerListEntry>()
-			};
-			PopulateTickerListEntries(result.Tickers, payload.tickers);
+				var payload = JsonConvert.DeserializeObject<BitX_AllTickers_QueryResponse>(responseContent);
+				var payloadData = new TickerList
+				{
+					Tickers = new List<TickerListEntry>()
+				};
+				PopulateTickerListEntries(payloadData.Tickers, payload.tickers);
+				return payloadData;
+			});
 			return result;
 		}
 
@@ -85,62 +89,84 @@ namespace FW.BitX
 			}
 		}
 
-		public TickerInfo GetTickerInfoFromWeb()
+		public ResponseWrapper<TickerInfo> GetTickerInfoFromWeb()
 		{
 			return GetTickerInfoFromEndPoint(BaseUrlWeb + "ticker?pair=XBTZAR");
 		}
 
-		public TickerInfo GetTickerInfoFromApi()
+		public ResponseWrapper<TickerInfo> GetTickerInfoFromApi()
 		{
 			return GetTickerInfoFromEndPoint(BaseUrlApi + "ticker?pair=XBTZAR");
 		}
 
-		private TickerInfo GetTickerInfoFromEndPoint(string url)
+		private ResponseWrapper<TickerInfo> GetTickerInfoFromEndPoint(string url)
 		{
 			var restClient = new RestClient();
 			var restResponse = restClient.ExecuteRequest(url, null);
-			var payload = JsonConvert.DeserializeObject<BitX_Ticker_QueryResponse>(restResponse.ResponseContent);
-			var result = new TickerInfo
+			var result = new ResponseWrapper<TickerInfo>(restResponse, (responseContent) =>
 			{
-				BitXTimeStamp = payload.timestamp,
-				TimeStampUTC = BitXUnixTime.DateTimeUTCFromBitXUnixTime(payload.timestamp),
-				Ask = Decimal.Parse(payload.ask),
-				Bid = Decimal.Parse(payload.bid),
-				LastTrade = Decimal.Parse(payload.last_trade),
-				Rolling24HourVolume = Decimal.Parse(payload.rolling_24_hour_volume),
-			};
+				var payload = JsonConvert.DeserializeObject<BitX_Ticker_QueryResponse>(restResponse.ResponseContent);
+				var payloadData = new TickerInfo
+				{
+					BitXTimeStamp = payload.timestamp,
+					TimeStampUTC = BitXUnixTime.DateTimeUTCFromBitXUnixTime(payload.timestamp),
+					Ask = Decimal.Parse(payload.ask),
+					Bid = Decimal.Parse(payload.bid),
+					LastTrade = Decimal.Parse(payload.last_trade),
+					Rolling24HourVolume = Decimal.Parse(payload.rolling_24_hour_volume),
+				};
+				return payloadData;
+			});
 			return result;
 		}
 
-		public OrderBook GetOrderBookFromWeb()
+		public ResponseWrapper<OrderBook> GetOrderBookFromWeb()
 		{
 			return GetOrderBookFromEndpoint(BaseUrlWeb + "orderbook?pair=XBTZAR");
 		}
 
-		public OrderBook GetOrderBookFromApi()
+		public ResponseWrapper<OrderBook> GetOrderBookFromApi()
 		{
 			return GetOrderBookFromEndpoint(BaseUrlApi + "orderbook?pair=XBTZAR");
 		}
 
-		private OrderBook GetOrderBookFromEndpoint(string url)
+		private ResponseWrapper<OrderBook> GetOrderBookFromEndpoint(string url)
 		{
 			//var restClient = new RestClient();
 			//var restResponse = restClient.ExecuteRequest(url, null);
 			//var payload = JsonConvert.DeserializeObject<BitX_OrderBook_QueryResponse>(restResponse.ResponseContent);
-			BitX_OrderBook_QueryResponse payload;
-			if (GetPayloadAnonymous(out payload, url))
+
+			var restClient = new RestClient();
+			var restResponse = restClient.ExecuteRequest(url, null);
+			var result = new ResponseWrapper<OrderBook>(restResponse, (responseContent) =>
 			{
-				var result = new OrderBook
-				{
-					Currency = payload.currency,
-					BitXTimeStamp = payload.timestamp,
-					TimeStampUTC = BitXUnixTime.DateTimeUTCFromBitXUnixTime(payload.timestamp),
-				};
-				PopulateOrderBookEntries(result.Asks, payload.asks);
-				PopulateOrderBookEntries(result.Bids, payload.bids);
-				return result;
-			}
-			return null;
+				var payload = JsonConvert.DeserializeObject<BitX_OrderBook_QueryResponse>(restResponse.ResponseContent);
+				var payloadData = new OrderBook
+					{
+						Currency = payload.currency,
+						BitXTimeStamp = payload.timestamp,
+						TimeStampUTC = BitXUnixTime.DateTimeUTCFromBitXUnixTime(payload.timestamp),
+					};
+				PopulateOrderBookEntries(payloadData.Asks, payload.asks);
+				PopulateOrderBookEntries(payloadData.Bids, payload.bids);
+				return payloadData;
+			});
+			return result;
+
+			//BitX_OrderBook_QueryResponse payload;
+			//if (GetPayloadAnonymous(out payload, url))
+			//{
+			//	var result = new OrderBook
+			//	{
+			//		Currency = payload.currency,
+			//		BitXTimeStamp = payload.timestamp,
+			//		TimeStampUTC = BitXUnixTime.DateTimeUTCFromBitXUnixTime(payload.timestamp),
+			//	};
+			//	PopulateOrderBookEntries(result.Asks, payload.asks);
+			//	PopulateOrderBookEntries(result.Bids, payload.bids);
+			//	return result;
+			//}
+			//return null;
 		}
 
 		private void PopulateOrderBookEntries(List<OrderBookEntry> list, BitX_OrderBookEntry[] entries)
@@ -155,31 +181,34 @@ namespace FW.BitX
 			}
 		}
 
-		public TradeInfo GetTradesFromWeb()
+		public ResponseWrapper<TradeInfo> GetTradesFromWeb()
 		{
 			return GetTradesFromUrl(BaseUrlWeb + "trades?pair=XBTZAR");
 		}
 
-		public TradeInfo GetTradesFromApi()
+		public ResponseWrapper<TradeInfo> GetTradesFromApi()
 		{
 			return GetTradesFromUrl(BaseUrlApi + "trades?pair=XBTZAR");
 		}
 
-		private TradeInfo GetTradesFromUrl(string url)
+		private ResponseWrapper<TradeInfo> GetTradesFromUrl(string url)
 		{
 			//var restClient = new RestClient();
 			//var restResponse = restClient.ExecuteRequest(url, null);
 			//var payload = JsonConvert.DeserializeObject<BitX_Trade_QueryResponse>(restResponse.ResponseContent);
-			BitX_Trade_QueryResponse payload;
-			if (GetPayloadAnonymous(out payload, url))
+
+			var restClient = new RestClient();
+			var restResponse = restClient.ExecuteRequest(url, null);
+			var result = new ResponseWrapper<TradeInfo>(restResponse, (responseContent) =>
 			{
-				var result = new TradeInfo
+				var payload = JsonConvert.DeserializeObject<BitX_Trade_QueryResponse>(restResponse.ResponseContent);
+				var payloadData = new TradeInfo
 				{
 					Currency = payload.currency,
 				};
 				foreach (var item in payload.trades)
 				{
-					result.Trades.Add(new Trade
+					payloadData.Trades.Add(new Trade
 					{
 						Price = Decimal.Parse(item.price),
 						Volume = Decimal.Parse(item.volume),
@@ -187,28 +216,52 @@ namespace FW.BitX
 						TimeStampUTC = BitXUnixTime.DateTimeUTCFromBitXUnixTime(item.timestamp),
 					});
 				}
-				return result;
-			}
-			return null;
+				return payloadData;
+			});
+			return result;
+
+			//BitX_Trade_QueryResponse payload;
+			//if (GetPayloadAnonymous(out payload, url))
+			//{
+			//	var result = new TradeInfo
+			//	{
+			//		Currency = payload.currency,
+			//	};
+			//	foreach (var item in payload.trades)
+			//	{
+			//		result.Trades.Add(new Trade
+			//		{
+			//			Price = Decimal.Parse(item.price),
+			//			Volume = Decimal.Parse(item.volume),
+			//			BitXTimeStamp = item.timestamp,
+			//			TimeStampUTC = BitXUnixTime.DateTimeUTCFromBitXUnixTime(item.timestamp),
+			//		});
+			//	}
+			//	return result;
+			//}
+			//return null;
 		}
 
-		public List<AccountBalance> GetBalances()
+		public ResponseWrapper<List<AccountBalance>> GetBalances()
 		{
 			return GetBalancesFromUrl(BaseUrlApi + "balance");
 		}
 
-		private List<AccountBalance> GetBalancesFromUrl(string url)
+		private ResponseWrapper<List<AccountBalance>> GetBalancesFromUrl(string url)
 		{
 			//var restClient = new RestClient(_ApiKey, _ApiSecret);
 			//var restResponse = restClient.ExecuteRequest(url, null);
 			//var payload = JsonConvert.DeserializeObject<BitX_Balances_QueryResponse>(restResponse.ResponseContent);
-			BitX_Balances_QueryResponse payload;
-			if (GetPayloadAuthenticated(out payload, url))
+
+			var restClient = new RestClient(_ApiKey, _ApiSecret);
+			var restResponse = restClient.ExecuteRequest(url, null);
+			var result = new ResponseWrapper<List<AccountBalance>>(restResponse, (responseContent) =>
 			{
-				var result = new List<AccountBalance>();
+				var payload = JsonConvert.DeserializeObject<BitX_Balances_QueryResponse>(restResponse.ResponseContent);
+				var payloadData = new List<AccountBalance>();
 				foreach (var balance in payload.balance)
 				{
-					result.Add(new AccountBalance
+					payloadData.Add(new AccountBalance
 					{
 						AccountID = balance.account_id,
 						Asset = balance.asset,
@@ -218,12 +271,66 @@ namespace FW.BitX
 						Unconfirmed = Decimal.Parse(balance.unconfirmed),
 					});
 				}
-				return result;
-			}
-			return null;
+				return payloadData;
+			});
+			return result;
+
+			//BitX_Balances_QueryResponse payload;
+			//if (GetPayloadAuthenticated(out payload, url))
+			//{
+			//	var result = new List<AccountBalance>();
+			//	foreach (var balance in payload.balance)
+			//	{
+			//		result.Add(new AccountBalance
+			//		{
+			//			AccountID = balance.account_id,
+			//			Asset = balance.asset,
+			//			Name = balance.name,
+			//			Balance = Decimal.Parse(balance.balance),
+			//			Reserved = Decimal.Parse(balance.reserved),
+			//			Unconfirmed = Decimal.Parse(balance.unconfirmed),
+			//		});
+			//	}
+			//	return result;
+			//}
+			//return null;
 		}
 
-		public List<TransactionEntry> GetTransactions(string accountID, int minRow, int maxRow)
+		public ResponseWrapper<List<PendingTransactionEntry>> GetPendingTransactions(string accountID)
+		{
+			return GetPendingTransactionsFromUrl(BaseUrlApi + "accounts/"
+				+ HttpUtility.UrlEncode(accountID) + "/pending"
+			);
+		}
+
+		private ResponseWrapper<List<PendingTransactionEntry>> GetPendingTransactionsFromUrl(string url)
+		{
+			var restClient = new RestClient(_ApiKey, _ApiSecret);
+			var restResponse = restClient.ExecuteRequest(url, null);
+			var result = new ResponseWrapper<List<PendingTransactionEntry>>(restResponse, (responseContent) =>
+			{
+				var payload = JsonConvert.DeserializeObject<BitX_PendingTransactions_QueryResponse>(restResponse.ResponseContent);
+				var payloadData = new List<PendingTransactionEntry>();
+				foreach (var transaction in payload.pending)
+				{
+					payloadData.Add(new PendingTransactionEntry
+					{
+						BitXTimeStamp = transaction.timestamp,
+						TimeStampUTC = BitXUnixTime.DateTimeUTCFromBitXUnixTime(transaction.timestamp),
+						Balance = (Decimal)transaction.balance,
+						Available = (Decimal)transaction.available,
+						BalanceDelta = (Decimal)transaction.balance_delta,
+						AvailableDelta = (Decimal)transaction.available_delta,
+						Currency = transaction.currency,
+						Description = transaction.description,
+					});
+				}
+				return payloadData;
+			});
+			return result;
+		}
+
+		public ResponseWrapper<List<TransactionEntry>> GetTransactions(string accountID, int minRow, int maxRow)
 		{
 			return GetTransactionsFromUrl(BaseUrlApi + "accounts/"
 				+ HttpUtility.UrlEncode(accountID) + "/transactions"
@@ -232,18 +339,21 @@ namespace FW.BitX
 			);
 		}
 
-		private List<TransactionEntry> GetTransactionsFromUrl(string url)
+		private ResponseWrapper<List<TransactionEntry>> GetTransactionsFromUrl(string url)
 		{
 			//var restClient = new RestClient(_ApiKey, _ApiSecret);
 			//var restResponse = restClient.ExecuteRequest(url, null);
 			//var payload = JsonConvert.DeserializeObject<BitX_Transactions_QueryResponse>(restResponse.ResponseContent);
-			BitX_Transactions_QueryResponse payload;
-			if (GetPayloadAuthenticated(out payload, url))
+
+			var restClient = new RestClient(_ApiKey, _ApiSecret);
+			var restResponse = restClient.ExecuteRequest(url, null);
+			var result = new ResponseWrapper<List<TransactionEntry>>(restResponse, (responseContent) =>
 			{
-				var result = new List<TransactionEntry>();
+				var payload = JsonConvert.DeserializeObject<BitX_Transactions_QueryResponse>(restResponse.ResponseContent);
+				var payloadData = new List<TransactionEntry>();
 				foreach (var transaction in payload.transactions)
 				{
-					result.Add(new TransactionEntry
+					payloadData.Add(new TransactionEntry
 					{
 						RowIndex = transaction.row_index,
 						BitXTimeStamp = transaction.timestamp,
@@ -256,10 +366,35 @@ namespace FW.BitX
 						Description = transaction.description,
 					});
 				}
-				return result;
-			}
-			return null;
+				return payloadData;
+			});
+			return result;
+
+			//BitX_Transactions_QueryResponse payload;
+			//if (GetPayloadAuthenticated(out payload, url))
+			//{
+			//	var result = new List<TransactionEntry>();
+			//	foreach (var transaction in payload.transactions)
+			//	{
+			//		result.Add(new TransactionEntry
+			//		{
+			//			RowIndex = transaction.row_index,
+			//			BitXTimeStamp = transaction.timestamp,
+			//			TimeStampUTC = BitXUnixTime.DateTimeUTCFromBitXUnixTime(transaction.timestamp),
+			//			Balance = (Decimal)transaction.balance,
+			//			Available = (Decimal)transaction.available,
+			//			BalanceDelta = (Decimal)transaction.balance_delta,
+			//			AvailableDelta = (Decimal)transaction.available_delta,
+			//			Currency = transaction.currency,
+			//			Description = transaction.description,
+			//		});
+			//	}
+			//	return result;
+			//}
+			//return null;
 		}
+
+		#region Old. Abandoned.
 
 		private bool GetPayloadAnonymous<T>(out T payload, string url)
 			where T : class
@@ -289,5 +424,6 @@ namespace FW.BitX
 			return false;
 		}
 
+		#endregion
 	}
 }

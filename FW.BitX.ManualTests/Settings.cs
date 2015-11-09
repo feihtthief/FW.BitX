@@ -10,5 +10,7 @@ namespace FW.BitX.ManualTests
 	{
 		public string ApiKey { get; set; }
 		public string ApiSecret { get; set; }
+		public string AccountID_XBT { get; set; }
+		public string AccountID_ZAR { get; set; }
 	}
 }

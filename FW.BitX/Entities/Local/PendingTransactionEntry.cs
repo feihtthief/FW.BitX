@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FW.BitX.Entities.Local
 {
-	public class TransactionEntry
+	public class PendingTransactionEntry
 	{
 		public int RowIndex { get; set; }
 		public long BitXTimeStamp { get; set; }
