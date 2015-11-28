@@ -36,17 +36,102 @@ namespace FW.BitX
 			var restResponse = restClient.ExecuteRequest("http://localhost/thereisnosuchfile", null);
 		}
 
-		// todo: rework all of these to return encapsulated response object to allow the calling app to know that the web server response code was a throttle response (503)
-		// todo: implement PAIRS enum
+		// done: rework all of these to return encapsulated response object to allow the calling app to know that the web server response code was a throttle response (503)
+		// done: accounts (=balances)
+		// done: tickers
+		// done: pending transactions
+		// done: list orders
 
-		// todo: tickers
-		// done: ticker(pair)
-		// todo: accounts
-		// todo: pending transactions
-		// todo: list orders
+		// todo: implement PAIRS enum or const class
+
+		// todo: ticker(pair) half done, still uses fixed pair
 		// todo: post order
 		// todo: stop order
 		// todo: get order?
+
+		public ResponseWrapper<PostLimitOrderResponse> PostLimitOrder(string pair, string type, decimal volume, int price)
+		{
+			// todo: enforce pair is something sane from valid pairs enum/const-class (like XBTZAR)
+			// todo: enforce type is something sane from valid type  enum/const-class (ie, BID or ASK)
+			var data = ""
+				+ "pair=" + HttpUtility.UrlEncode(pair)
+				+ "&type=" + HttpUtility.UrlEncode(type)
+				+ "&volume=" + HttpUtility.UrlEncode(volume.ToString())
+				+ "&price=" + HttpUtility.UrlEncode(price.ToString("n0"))
+			;
+			return PostLimitOrderToEndpoint(BaseUrlApi + "postorder"
+				, data
+				);
+		}
+
+		private ResponseWrapper<PostLimitOrderResponse> PostLimitOrderToEndpoint(string url, string data)
+		{
+			var restClient = new RestClient(_ApiKey, _ApiSecret);
+			var restResponse = restClient.ExecuteRequest(url, data);
+			var result = new ResponseWrapper<PostLimitOrderResponse>(restResponse, (responseContent) =>
+			{
+				var payload = JsonConvert.DeserializeObject<BitX_PostLimitOrder_Response>(responseContent);
+				var payloadData = new PostLimitOrderResponse
+				{
+					OrderID = payload.id,
+				};
+				return payloadData;
+			});
+			return result;
+		}
+
+		public ResponseWrapper<OrderInfo> GetOrderInfo(string orderID)
+		{
+			return GetOrderInfoEndPoint(BaseUrlApi + "orders/"
+				+ HttpUtility.UrlEncode(orderID)
+				);
+		}
+
+		private ResponseWrapper<OrderInfo> GetOrderInfoEndPoint(string url)
+		{
+			var restClient = new RestClient(_ApiKey, _ApiSecret);
+			var restResponse = restClient.ExecuteRequest(url, null);
+			var result = new ResponseWrapper<OrderInfo>(restResponse, (responseContent) =>
+			{
+				var payload = JsonConvert.DeserializeObject<BitX_GetOrder_QueryResponse>(responseContent);
+				var payloadData = new OrderInfo
+				{
+					Base = Decimal.Parse(payload.@base),
+					BitXCreationTimestamp = payload.creation_timestamp,
+					CreationTimestampUTC = BitXUnixTime.DateTimeUTCFromBitXUnixTime(payload.creation_timestamp),
+					BitXExpirationTimestamp = payload.expiration_timestamp,
+					ExpirationTimestampUTC = BitXUnixTime.DateTimeUTCFromBitXUnixTime(payload.expiration_timestamp),
+					Counter = Decimal.Parse(payload.counter),
+					FeeBase = Decimal.Parse(payload.fee_base),
+					FeeCounter = Decimal.Parse(payload.fee_counter),
+					LimitPrice = Decimal.Parse(payload.limit_price),
+					LimitVolume = Decimal.Parse(payload.limit_volume),
+					OrderID = payload.order_id,
+					State = payload.state,
+					Type = payload.type,
+					Trades = new List<OrderTrade>(),
+				};
+				PopulateOrderInfoEntries(payloadData.Trades, payload.trades);
+				return payloadData;
+			});
+			return result;
+		}
+
+		private void PopulateOrderInfoEntries(List<OrderTrade> list, BitX_OrderTrade[] entries)
+		{
+			foreach (var item in entries)
+			{
+				list.Add(
+					new OrderTrade
+					{
+						BitXTimeStamp = item.timestamp,
+						TimeStampUTC = BitXUnixTime.DateTimeUTCFromBitXUnixTime(item.timestamp),
+						Price = Decimal.Parse(item.price),
+						Volume = Decimal.Parse(item.volume),
+					}
+				);
+			}
+		}
 
 		public ResponseWrapper<TickerList> GetTickerList()
 		{
@@ -425,5 +510,6 @@ namespace FW.BitX
 		}
 
 		#endregion
+
 	}
 }

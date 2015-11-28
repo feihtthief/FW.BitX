@@ -38,6 +38,13 @@ namespace FW.BitX.Logic
 					string _cred = string.Format("{0} {1}", "Basic", _enc);
 					webReq.Headers[HttpRequestHeader.Authorization] = _cred;
 				}
+				if (!string.IsNullOrEmpty(data))
+				{
+					var bytes = Encoding.UTF8.GetBytes(data);
+					webReq.ContentType = "application/x-www-form-urlencoded";
+					webReq.Method = WebRequestMethods.Http.Post;
+					webReq.GetRequestStream().Write(bytes, 0, bytes.Length);
+				}
 				var webResponse = (HttpWebResponse)webReq.GetResponse();
 				result.StatusCode = webResponse.StatusCode;
 				result.ResponseContent = GetResponseContentFromWebResponse(webResponse);
