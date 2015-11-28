@@ -26,7 +26,7 @@ namespace FW.BitX.ManualTests
 
 			//var placeLimitOrderResponse = authorizedClient.PostLimitOrder("XBTZAR", "BID", 0.001m, 15);
 
-			var knownOrderID = "";
+			var knownOrderID = "BXHTMG3J228ATEN";
 
 			if (!string.IsNullOrEmpty(knownOrderID))
 			{

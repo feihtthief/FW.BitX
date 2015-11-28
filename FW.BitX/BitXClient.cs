@@ -41,11 +41,11 @@ namespace FW.BitX
 		// done: tickers
 		// done: pending transactions
 		// done: list orders
+		// done: post order
 
 		// todo: implement PAIRS enum or const class
 
 		// todo: ticker(pair) half done, still uses fixed pair
-		// todo: post order
 		// todo: stop order
 		// todo: get order?
 
@@ -111,7 +111,10 @@ namespace FW.BitX
 					Type = payload.type,
 					Trades = new List<OrderTrade>(),
 				};
-				PopulateOrderInfoEntries(payloadData.Trades, payload.trades);
+				if (payload.trades != null)
+				{
+					PopulateOrderInfoEntries(payloadData.Trades, payload.trades);
+				}
 				return payloadData;
 			});
 			return result;
