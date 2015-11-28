@@ -140,7 +140,7 @@ namespace FW.BitX
 
 		private ResponseWrapper<TickerList> GetTickerListFromEndPoint(string url)
 		{
-			var restClient = new RestClient();
+			var restClient = new RestClient(_ApiKey, _ApiSecret);
 			var restResponse = restClient.ExecuteRequest(url, null);
 			var result = new ResponseWrapper<TickerList>(restResponse, (responseContent) =>
 			{
@@ -186,7 +186,7 @@ namespace FW.BitX
 
 		private ResponseWrapper<TickerInfo> GetTickerInfoFromEndPoint(string url)
 		{
-			var restClient = new RestClient();
+			var restClient = new RestClient(_ApiKey, _ApiSecret);
 			var restResponse = restClient.ExecuteRequest(url, null);
 			var result = new ResponseWrapper<TickerInfo>(restResponse, (responseContent) =>
 			{
@@ -221,7 +221,7 @@ namespace FW.BitX
 			//var restResponse = restClient.ExecuteRequest(url, null);
 			//var payload = JsonConvert.DeserializeObject<BitX_OrderBook_QueryResponse>(restResponse.ResponseContent);
 
-			var restClient = new RestClient();
+			var restClient = new RestClient(_ApiKey, _ApiSecret);
 			var restResponse = restClient.ExecuteRequest(url, null);
 			var result = new ResponseWrapper<OrderBook>(restResponse, (responseContent) =>
 			{
@@ -282,7 +282,7 @@ namespace FW.BitX
 			//var restResponse = restClient.ExecuteRequest(url, null);
 			//var payload = JsonConvert.DeserializeObject<BitX_Trade_QueryResponse>(restResponse.ResponseContent);
 
-			var restClient = new RestClient();
+			var restClient = new RestClient(_ApiKey, _ApiSecret);
 			var restResponse = restClient.ExecuteRequest(url, null);
 			var result = new ResponseWrapper<TradeInfo>(restResponse, (responseContent) =>
 			{

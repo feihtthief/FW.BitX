@@ -24,20 +24,21 @@ namespace FW.BitX.ManualTests
 			DateTime startDT;
 			DateTime endDT;
 
-			var placeLimitOrderResponse = authorizedClient.PostLimitOrder("XBTZAR", "BID", 0.001m, 15);
-
-			
+			//var placeLimitOrderResponse = authorizedClient.PostLimitOrder("XBTZAR", "BID", 0.001m, 15);
 
 			var knownOrderID = "";
 
-			var orderInfo = authorizedClient.GetOrderInfo(knownOrderID);
-			if (orderInfo.OK)
+			if (!string.IsNullOrEmpty(knownOrderID))
 			{
+				var orderInfo = authorizedClient.GetOrderInfo(knownOrderID);
+				if (orderInfo.OK)
+				{
 
-			}
-			else
-			{
-				Console.WriteLine("Authenticated GetOrderInfo via API Failed: {0}", orderInfo);
+				}
+				else
+				{
+					Console.WriteLine("Authenticated GetOrderInfo via API Failed: {0}", orderInfo);
+				}
 			}
 
 			var anon_TickerList_ViaApi = anonymousClient.GetTickerList();
