@@ -10,7 +10,7 @@ namespace FW.BitX.Entities.Remote
 	{
 		public string order_id { get; set; }
 		public long creation_timestamp { get; set; }
-		public int expiration_timestamp { get; set; }
+		public long expiration_timestamp { get; set; }
 		public string type { get; set; }
 		public string state { get; set; }
 		public string limit_price { get; set; }

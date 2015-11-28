@@ -26,8 +26,21 @@ namespace FW.BitX.ManualTests
 
 			//var placeLimitOrderResponse = authorizedClient.PostLimitOrder("XBTZAR", "BID", 0.001m, 15);
 
-			var knownOrderID = "BXHTMG3J228ATEN";
+			var stopOrderID = "";
+			if (!string.IsNullOrEmpty(stopOrderID))
+			{
+				var stopOrderRepsonse = authorizedClient.StopOrder(stopOrderID);
+				if (stopOrderRepsonse.OK)
+				{
 
+				}
+				else
+				{
+					Console.WriteLine("Authenticated StopOrder via API Failed: {0}", stopOrderRepsonse);
+				}
+			}
+
+			var knownOrderID = "";
 			if (!string.IsNullOrEmpty(knownOrderID))
 			{
 				var orderInfo = authorizedClient.GetOrderInfo(knownOrderID);

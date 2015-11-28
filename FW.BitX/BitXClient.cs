@@ -42,12 +42,12 @@ namespace FW.BitX
 		// done: pending transactions
 		// done: list orders
 		// done: post order
+		// done: get order info
 
 		// todo: implement PAIRS enum or const class
 
 		// todo: ticker(pair) half done, still uses fixed pair
 		// todo: stop order
-		// todo: get order?
 
 		public ResponseWrapper<PostLimitOrderResponse> PostLimitOrder(string pair, string type, decimal volume, int price)
 		{
@@ -74,6 +74,32 @@ namespace FW.BitX
 				var payloadData = new PostLimitOrderResponse
 				{
 					OrderID = payload.id,
+				};
+				return payloadData;
+			});
+			return result;
+		}
+
+		public ResponseWrapper<StopOrderResponse> StopOrder(string orderID)
+		{
+			var data = ""
+				+ "order_id=" + HttpUtility.UrlEncode(orderID)
+			;
+			return PostStopOrderToEndpoint(BaseUrlApi + "stoporder"
+				, data
+				);
+		}
+
+		private ResponseWrapper<StopOrderResponse> PostStopOrderToEndpoint(string url, string data)
+		{
+			var restClient = new RestClient(_ApiKey, _ApiSecret);
+			var restResponse = restClient.ExecuteRequest(url, data);
+			var result = new ResponseWrapper<StopOrderResponse>(restResponse, (responseContent) =>
+			{
+				var payload = JsonConvert.DeserializeObject<BitX_StopOrder_Response>(responseContent);
+				var payloadData = new StopOrderResponse
+				{
+					Success = payload.success,
 				};
 				return payloadData;
 			});

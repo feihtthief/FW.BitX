@@ -52,6 +52,7 @@
     <Compile Include="Entities\Local\OrderTrade.cs" />
     <Compile Include="Entities\Local\PendingTransactionEntry.cs" />
     <Compile Include="Entities\Local\PostLimitOrderResponse.cs" />
+    <Compile Include="Entities\Local\StopOrderResponse.cs" />
     <Compile Include="Entities\Local\TickerListEntry.cs" />
     <Compile Include="Entities\Local\TickerInfo.cs" />
     <Compile Include="Entities\Local\TickerList.cs" />
@@ -69,6 +70,7 @@
     <Compile Include="Entities\Remote\BitX_OrderTrade.cs" />
     <Compile Include="Entities\Remote\BitX_PendingTransaction.cs" />
     <Compile Include="Entities\Remote\BitX_PostLimitOrderResponse.cs" />
+    <Compile Include="Entities\Remote\BitX_StopOrder_Response.cs" />
     <Compile Include="Entities\Remote\BitX_Ticker_QueryResponse.cs" />
     <Compile Include="Entities\Remote\BitX_Trade.cs" />
     <Compile Include="Entities\Remote\BitX_Trade_QueryResponse.cs" />
