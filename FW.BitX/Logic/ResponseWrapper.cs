@@ -28,5 +28,18 @@ namespace FW.BitX.Logic
 			return String.Format("[{0}]", (int)RestResponse.StatusCode);
 		}
 
+#if DEBUG
+		// For Unit Testing
+		public ResponseWrapper(T internalResponse, RestResponse restResponse = null, bool ok = true)
+		{
+			this.RestResponse = restResponse;
+			this.OK = (restResponse == null) ? ok : RestResponse.OK;
+			if (this.OK)
+			{
+				PayloadResponse = internalResponse;
+			}
+		}
+#endif
+
 	}
 }
