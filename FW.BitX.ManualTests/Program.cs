@@ -26,7 +26,7 @@ namespace FW.BitX.ManualTests
 
 			//var placeLimitOrderResponse = authorizedClient.PostLimitOrder("XBTZAR", "BID", 0.001m, 15);
 			// TODO: retest when I have some money again.
-			//var placeLimitOrderResponse = authorizedClient.PostLimitOrder(Enums.BitXPair.XBTZAR, Enums.BitXType.BID, 0.001m, 15);
+			//var placeLimitOrderResponse = authorizedClient.PostLimitOrder(BitXPair.XBTZAR, BitXType.BID, 0.001m, 15);
 
 			var stopOrderID = "";
 			if (!string.IsNullOrEmpty(stopOrderID))
