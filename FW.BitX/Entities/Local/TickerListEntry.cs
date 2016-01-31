@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FW.BitX.Entities.Local
 {
-	// todo: combine this with with TickerInfo ???
+	// todo: combine this with TickerInfo ???
 	// maybe make this be the result, and automatically add the PAIR from the ticker?pair=Pair call???
 	public class TickerListEntry : TickerInfo
 	{
