@@ -1,5 +1,6 @@
 ﻿using FW.BitX.Entities.Local;
 using FW.BitX.Entities.Remote;
+using FW.BitX.Enums;
 using FW.BitX.Logic;
 using Newtonsoft.Json;
 using System;
@@ -49,13 +50,15 @@ namespace FW.BitX
 		// todo: ticker(pair) half done, still uses fixed pair
 		// todo: stop order
 
-		public ResponseWrapper<PostLimitOrderResponse> PostLimitOrder(string pair, string type, decimal volume, int price)
+		public ResponseWrapper<PostLimitOrderResponse> PostLimitOrder(Enums.BitXPair pair, Enums.BitXType type, decimal volume, int price)
 		{
 			// todo: enforce pair is something sane from valid pairs enum/const-class (like XBTZAR)
 			// todo: enforce type is something sane from valid type  enum/const-class (ie, BID or ASK)
+			var pairStr = BitXEnumResolver.GetStringForPair(pair);
+			var typeStr = BitXEnumResolver.GetStringForType(type);
 			var data = ""
-				+ "pair=" + HttpUtility.UrlEncode(pair)
-				+ "&type=" + HttpUtility.UrlEncode(type)
+				+ "pair=" + HttpUtility.UrlEncode(pairStr)
+				+ "&type=" + HttpUtility.UrlEncode(typeStr)
 				+ "&volume=" + HttpUtility.UrlEncode(volume.ToString())
 				+ "&price=" + HttpUtility.UrlEncode(price.ToString("n0"))
 			;
