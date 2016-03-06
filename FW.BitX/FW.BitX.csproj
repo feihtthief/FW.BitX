@@ -80,7 +80,7 @@
     <Compile Include="Entities\Remote\BitX_Transactions_QueryResponse.cs" />
     <Compile Include="Enums\BitXEnumResolver.cs" />
     <Compile Include="Enums\BitXPair.cs" />
-    <Compile Include="Enums\BitXType.cs" />
+    <Compile Include="Enums\BitXTransactionType.cs" />
     <Compile Include="Logic\BitXUnixTime.cs" />
     <Compile Include="Logic\ResponseWrapper.cs" />
     <Compile Include="Logic\RestClient.cs" />

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FW.BitX.Enums
 {
-	public enum BitXType
+	public enum BitXTransactionType
 	{
 		ASK,
 		BID,

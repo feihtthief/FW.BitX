@@ -45,26 +45,26 @@ namespace FW.BitX
 		// done: post order
 		// done: get order info
 
-		// todo: implement PAIRS enum or const class
+		// done: implement PAIRS enum
+		// done: implement Asx/Buy enum
 
-		// todo: ticker(pair) half done, still uses fixed pair
-		// todo: stop order
+		// done : stop order
 
-		public ResponseWrapper<PostLimitOrderResponse> PostLimitOrder(Enums.BitXPair pair, Enums.BitXType type, decimal volume, int price)
+		public ResponseWrapper<PostLimitOrderResponse> PostLimitOrder(Enums.BitXPair pair, Enums.BitXTransactionType transactionType, decimal volume, int price)
 		{
-			// todo: enforce pair is something sane from valid pairs enum/const-class (like XBTZAR)
-			// todo: enforce type is something sane from valid type  enum/const-class (ie, BID or ASK)
+			// done: enforce pair is something sane from valid pairs enum/const-class (like XBTZAR)
+			// done: enforce type is something sane from valid type  enum/const-class (ie, BID or ASK)
 			var pairStr = BitXEnumResolver.GetStringForPair(pair);
-			var typeStr = BitXEnumResolver.GetStringForType(type);
+			var transactionTypeStr = BitXEnumResolver.GetStringForTransactionType(transactionType);
 			var data = ""
 				+ "pair=" + HttpUtility.UrlEncode(pairStr)
-				+ "&type=" + HttpUtility.UrlEncode(typeStr)
+				+ "&type=" + HttpUtility.UrlEncode(transactionTypeStr)
 				+ "&volume=" + HttpUtility.UrlEncode(volume.ToString())
 				+ "&price=" + HttpUtility.UrlEncode(price.ToString("n0"))
 			;
 			return PostLimitOrderToEndpoint(BaseUrlApi + "postorder"
 				, data
-				);
+			);
 		}
 
 		private ResponseWrapper<PostLimitOrderResponse> PostLimitOrderToEndpoint(string url, string data)

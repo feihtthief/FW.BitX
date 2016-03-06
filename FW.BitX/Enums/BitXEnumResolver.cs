@@ -8,12 +8,12 @@ namespace FW.BitX.Enums
 {
 	public static class BitXEnumResolver
 	{
-		public static string GetStringForType(Enums.BitXType type)
+		public static string GetStringForTransactionType(Enums.BitXTransactionType type)
 		{
 			switch (type)
 			{
-				case BitXType.ASK: return "ASK";
-				case BitXType.BID: return "BID";
+				case BitXTransactionType.ASK: return "ASK";
+				case BitXTransactionType.BID: return "BID";
 				default:
 					throw new Exception("Invalid type");
 			}
