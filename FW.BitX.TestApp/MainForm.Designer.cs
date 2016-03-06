@@ -33,7 +33,7 @@
 			this.chTrade_Price = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.chTrade_Volume = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.btnGetTrades = new System.Windows.Forms.Button();
-			this.btnGetTransactions = new System.Windows.Forms.Button();
+			this.btnGetBalances = new System.Windows.Forms.Button();
 			this.lblApiKeyPrompt = new System.Windows.Forms.Label();
 			this.txtApiKey = new System.Windows.Forms.TextBox();
 			this.txtApiSecret = new System.Windows.Forms.TextBox();
@@ -45,9 +45,9 @@
 			// lvTrades
 			// 
 			this.lvTrades.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-			this.chTrade_TimeStamp,
-			this.chTrade_Price,
-			this.chTrade_Volume});
+            this.chTrade_TimeStamp,
+            this.chTrade_Price,
+            this.chTrade_Volume});
 			this.lvTrades.FullRowSelect = true;
 			this.lvTrades.GridLines = true;
 			this.lvTrades.Location = new System.Drawing.Point(202, 21);
@@ -78,21 +78,21 @@
 			// 
 			this.btnGetTrades.Location = new System.Drawing.Point(28, 21);
 			this.btnGetTrades.Name = "btnGetTrades";
-			this.btnGetTrades.Size = new System.Drawing.Size(75, 23);
+			this.btnGetTrades.Size = new System.Drawing.Size(160, 23);
 			this.btnGetTrades.TabIndex = 2;
 			this.btnGetTrades.Text = "Get Trades";
 			this.btnGetTrades.UseVisualStyleBackColor = true;
 			this.btnGetTrades.Click += new System.EventHandler(this.btnGetTrades_Click);
 			// 
-			// btnGetTransactions
+			// btnGetBalances
 			// 
-			this.btnGetTransactions.Location = new System.Drawing.Point(256, 215);
-			this.btnGetTransactions.Name = "btnGetTransactions";
-			this.btnGetTransactions.Size = new System.Drawing.Size(160, 23);
-			this.btnGetTransactions.TabIndex = 3;
-			this.btnGetTransactions.Text = "Get Transactions";
-			this.btnGetTransactions.UseVisualStyleBackColor = true;
-			this.btnGetTransactions.Click += new System.EventHandler(this.btnGetTransactions_Click);
+			this.btnGetBalances.Location = new System.Drawing.Point(28, 50);
+			this.btnGetBalances.Name = "btnGetBalances";
+			this.btnGetBalances.Size = new System.Drawing.Size(160, 23);
+			this.btnGetBalances.TabIndex = 3;
+			this.btnGetBalances.Text = "Get Balances";
+			this.btnGetBalances.UseVisualStyleBackColor = true;
+			this.btnGetBalances.Click += new System.EventHandler(this.btnGetTransactions_Click);
 			// 
 			// lblApiKeyPrompt
 			// 
@@ -157,7 +157,7 @@
 			this.Controls.Add(this.lblApiSecretPrompt);
 			this.Controls.Add(this.txtApiKey);
 			this.Controls.Add(this.lblApiKeyPrompt);
-			this.Controls.Add(this.btnGetTransactions);
+			this.Controls.Add(this.btnGetBalances);
 			this.Controls.Add(this.btnGetTrades);
 			this.Controls.Add(this.lvTrades);
 			this.Name = "MainForm";
@@ -175,7 +175,7 @@
 		private System.Windows.Forms.Button btnGetTrades;
 		private System.Windows.Forms.ColumnHeader chTrade_Price;
 		private System.Windows.Forms.ColumnHeader chTrade_Volume;
-		private System.Windows.Forms.Button btnGetTransactions;
+		private System.Windows.Forms.Button btnGetBalances;
 		private System.Windows.Forms.Label lblApiKeyPrompt;
 		private System.Windows.Forms.TextBox txtApiKey;
 		private System.Windows.Forms.TextBox txtApiSecret;

@@ -13,5 +13,6 @@ namespace FW.BitX.Entities.Remote
 		public long timestamp { get; set; }
 		public string price { get; set; }
 		public string volume { get; set; }
+		public bool is_buy { get; set; }
 	}
 }

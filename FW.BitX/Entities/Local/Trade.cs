@@ -12,5 +12,6 @@ namespace FW.BitX.Entities.Local
 		public decimal Volume { get; set; }
 		public long BitXTimeStamp { get; set; }
 		public DateTime TimeStampUTC { get; set; }
+		public bool IsBuy { get; set; }
 	}
 }

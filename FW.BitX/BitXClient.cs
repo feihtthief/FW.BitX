@@ -331,6 +331,7 @@ namespace FW.BitX
 						Volume = Decimal.Parse(item.volume),
 						BitXTimeStamp = item.timestamp,
 						TimeStampUTC = BitXUnixTime.DateTimeUTCFromBitXUnixTime(item.timestamp),
+						IsBuy = item.is_buy,
 					});
 				}
 				return payloadData;
