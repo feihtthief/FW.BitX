@@ -56,7 +56,7 @@ namespace FW.BitX.ManualTests
 			}
 
 			TestGetTrades();
-			//TestGetTradesWithSince();
+			TestGetTradesWithSince();
 
 			if (Over()) return;
 			Console.WriteLine();
@@ -251,7 +251,8 @@ namespace FW.BitX.ManualTests
 
 		private static void TestGetTradesWithSince()
 		{
-			var since = BitXUnixTime.BitXUnixTimeFromDateTimeUTC(DateTime.Now.Date.AddDays(-10));
+			//var since = BitXUnixTime.BitXUnixTimeFromDateTimeUTC(DateTime.Now.Date.AddDays(-10).ToUniversalTime());
+			var since = BitXUnixTime.BitXUnixTimeFromDateTimeUTC(DateTime.Now.Date.ToUniversalTime());
 			var ti = anonymousClient.GetTradesFromApi(since);
 			var min = ti.PayloadResponse.Trades.Min(t => t.TimeStampUTC);
 			var max = ti.PayloadResponse.Trades.Max(t => t.TimeStampUTC);
