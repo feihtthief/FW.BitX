@@ -298,14 +298,18 @@ namespace FW.BitX
 			}
 		}
 
-		public ResponseWrapper<TradeInfo> GetTradesFromWeb()
+		public ResponseWrapper<TradeInfo> GetTradesFromWeb(long? since = null)
 		{
-			return GetTradesFromUrl(BaseUrlWeb + "trades?pair=XBTZAR");
+			return GetTradesFromUrl(BaseUrlWeb + "trades?pair=XBTZAR"
+				+ (since.HasValue ? "&since=" + HttpUtility.UrlEncode(since.Value.ToString()) : "")
+			);
 		}
 
-		public ResponseWrapper<TradeInfo> GetTradesFromApi()
+		public ResponseWrapper<TradeInfo> GetTradesFromApi(long? since = null)
 		{
-			return GetTradesFromUrl(BaseUrlApi + "trades?pair=XBTZAR");
+			return GetTradesFromUrl(BaseUrlApi + "trades?pair=XBTZAR"
+				+ (since.HasValue ? "&since=" + HttpUtility.UrlEncode(since.Value.ToString()) : "")
+			);
 		}
 
 		private ResponseWrapper<TradeInfo> GetTradesFromUrl(string url)

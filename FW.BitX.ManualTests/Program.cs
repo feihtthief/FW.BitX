@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using FW.BitX.Logic;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,14 +16,12 @@ namespace FW.BitX.ManualTests
 	{
 		private static readonly string NL = Environment.NewLine;
 		private static Settings _Settings = null;
+		private static BitXClient authorizedClient;
+		private static BitXClient anonymousClient;
 
 		static void Main(string[] args)
 		{
-			TryLoadSettings();
-			var authorizedClient = new BitXClient(_Settings.ApiKey, _Settings.ApiSecret);
-			var anonymousClient = new BitXClient();
-			DateTime startDT;
-			DateTime endDT;
+			Init();
 
 			//var placeLimitOrderResponse = authorizedClient.PostLimitOrder("XBTZAR", "BID", 0.001m, 15);
 			// TODO: retest when I have some money again.
@@ -55,6 +54,12 @@ namespace FW.BitX.ManualTests
 					Console.WriteLine("Authenticated GetOrderInfo via API Failed: {0}", orderInfo);
 				}
 			}
+
+			TestGetTrades();
+			//TestGetTradesWithSince();
+
+			if (Over()) return;
+			Console.WriteLine();
 
 			var anon_TickerList_ViaApi = anonymousClient.GetTickerList();
 			if (anon_TickerList_ViaApi.OK)
@@ -120,6 +125,9 @@ namespace FW.BitX.ManualTests
 			Console.WriteLine();
 
 			authorizedClient.Fail(); // todo: remove. for testing only
+
+			if (Over()) return;
+			Console.WriteLine();
 
 			var balances = authorizedClient.GetBalances();
 			if (balances.OK)
@@ -228,12 +236,33 @@ namespace FW.BitX.ManualTests
 				Console.WriteLine("Anonymous GetOrderBook via WEB Failed: {0}", orderbook_ViaWeb);
 			}
 
-			if (Over()) return;
-			Console.WriteLine();
+			//////var webReq = WebRequest.Create("https://api.mybitx.com/api/1/trades?pair=XBTZAR");
+			//////var webResp = webReq.GetResponse();
+			//////var sr = new StreamReader(webResp.GetResponseStream());
+			//////var respString = sr.ReadToEnd();
+			//////Console.WriteLine(respString);
+			//////var resp = JsonConvert.DeserializeObject<BitX_TradeQueryResponse>(respString);
+			//////Console.WriteLine(resp.trades.Count());
 
-			startDT = DateTime.Now;
+			Console.WriteLine("End of the line");
+			Console.ReadKey(true);
+
+		}
+
+		private static void TestGetTradesWithSince()
+		{
+			var since = BitXUnixTime.BitXUnixTimeFromDateTimeUTC(DateTime.Now.Date.AddDays(-10));
+			var ti = anonymousClient.GetTradesFromApi(since);
+			var min = ti.PayloadResponse.Trades.Min(t => t.TimeStampUTC);
+			var max = ti.PayloadResponse.Trades.Max(t => t.TimeStampUTC);
+		}
+
+		private static void TestGetTrades()
+		{
+			Console.WriteLine("Trades via API");
+			var startDT = DateTime.Now;
 			var ti_A = anonymousClient.GetTradesFromApi();
-			endDT = DateTime.Now;
+			var endDT = DateTime.Now;
 			if (ti_A.OK)
 			{
 				Console.WriteLine(ti_A.PayloadResponse.Trades.Count());
@@ -242,7 +271,7 @@ namespace FW.BitX.ManualTests
 			{
 				Console.WriteLine("Anonymous GetTrades via API Failed: {0}", ti_A);
 			}
-			Console.WriteLine(endDT - startDT);
+			Console.WriteLine("Duration: {0}", endDT - startDT);
 			Console.WriteLine();
 
 			//foreach (var item in trades_A.Trades)
@@ -250,6 +279,8 @@ namespace FW.BitX.ManualTests
 			//    Console.WriteLine("{0,-20} | {1,20:n8} | {2,20} | {3,20:n8}", item.TimeStamp, item.Volume, item.Price, item.Volume * item.Price);
 			//}
 
+
+			Console.WriteLine("Trades via WEB");
 			startDT = DateTime.Now;
 			var ti_W = anonymousClient.GetTradesFromWeb();
 			endDT = DateTime.Now;
@@ -262,7 +293,7 @@ namespace FW.BitX.ManualTests
 			{
 				Console.WriteLine("Anonymous GetTrades via Web Failed: {0}", ti_W);
 			}
-			Console.WriteLine(endDT - startDT);
+			Console.WriteLine("Duration: {0}", endDT - startDT);
 			Console.WriteLine();
 
 			//foreach (var item in trades_B.Trades)
@@ -278,6 +309,8 @@ namespace FW.BitX.ManualTests
 				}
 				var sameCount = 0;
 				var diffCount = 0;
+				var minDateTime = DateTime.MaxValue;
+				var maxDateTime = DateTime.MinValue;
 				for (int i = 0; i < Math.Min(ti_A.PayloadResponse.Trades.Count(), ti_W.PayloadResponse.Trades.Count()); i++)
 				{
 					var a = ti_A.PayloadResponse.Trades[i];
@@ -295,23 +328,33 @@ namespace FW.BitX.ManualTests
 					{
 						diffCount++;
 					}
+					if (a.TimeStampUTC < minDateTime)
+					{
+						minDateTime = a.TimeStampUTC;
+					}
+					if (a.TimeStampUTC > maxDateTime)
+					{
+						maxDateTime = a.TimeStampUTC;
+					}
 				}
 				Console.WriteLine("Same Count: {0}", sameCount);
 				Console.WriteLine("Diff Count: {0}", diffCount);
+				Console.WriteLine("Min TimeStamp: {0}", minDateTime);
+				Console.WriteLine("Max TimeStamp: {0}", maxDateTime);
 				Console.WriteLine();
 			}
+		}
 
-			//////var webReq = WebRequest.Create("https://api.mybitx.com/api/1/trades?pair=XBTZAR");
-			//////var webResp = webReq.GetResponse();
-			//////var sr = new StreamReader(webResp.GetResponseStream());
-			//////var respString = sr.ReadToEnd();
-			//////Console.WriteLine(respString);
-			//////var resp = JsonConvert.DeserializeObject<BitX_TradeQueryResponse>(respString);
-			//////Console.WriteLine(resp.trades.Count());
+		private static void Init()
+		{
+			TryLoadSettings();
+			InitClients();
+		}
 
-			Console.WriteLine("End of the line");
-			Console.ReadKey(true);
-
+		private static void InitClients()
+		{
+			authorizedClient = new BitXClient(_Settings.ApiKey, _Settings.ApiSecret);
+			anonymousClient = new BitXClient();
 		}
 
 		private static void DumpPendingTransaction(Entities.Local.PendingTransactionEntry pendingTransaction)

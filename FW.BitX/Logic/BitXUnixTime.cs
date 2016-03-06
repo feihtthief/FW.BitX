@@ -17,5 +17,12 @@ namespace FW.BitX.Logic
 			return result;
 		}
 
+		public static long BitXUnixTimeFromDateTimeUTC(DateTime dateTimeUTC)
+		{
+			var diff = (dateTimeUTC - UnixEpoch);
+			var result = (long)diff.TotalMilliseconds;
+			return result;
+		}
+
 	}
 }
