@@ -340,8 +340,10 @@ namespace FW.BitX.ManualTests
 				}
 				Console.WriteLine("Same Count: {0}", sameCount);
 				Console.WriteLine("Diff Count: {0}", diffCount);
-				Console.WriteLine("Min TimeStamp: {0}", minDateTime);
-				Console.WriteLine("Max TimeStamp: {0}", maxDateTime);
+				Console.WriteLine("Min TimeStamp (UTC): {0}", minDateTime);
+				Console.WriteLine("Max TimeStamp (UTC): {0}", maxDateTime);
+				Console.WriteLine("Min TimeStamp (Local): {0}", minDateTime.ToLocalTime());
+				Console.WriteLine("Max TimeStamp (Local): {0}", maxDateTime.ToLocalTime());
 				Console.WriteLine();
 			}
 		}
