@@ -20,9 +20,7 @@ namespace FW.BitX
 		private string _ApiKey;
 		private string _ApiSecret;
 
-		public BitXClient()
-		{
-		}
+		public BitXClient() : this(null, null) { }
 
 		public BitXClient(string apiKey, string apiSecret)
 		{
