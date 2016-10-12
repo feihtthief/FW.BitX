@@ -44,7 +44,9 @@ namespace FW.BitX
 		// done: get order info
 
 		// done: implement PAIRS enum
-		// done: implement Asx/Buy enum
+		// done: implement Ask/Buy enum
+
+		// TODO: use PAIRS enum in all places where a pair can be provided
 
 		// done : stop order
 
