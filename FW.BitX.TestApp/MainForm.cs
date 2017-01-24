@@ -1,4 +1,5 @@
 ﻿using FW.BitX.Entities.Local;
+using FW.BitX.Enums;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -73,7 +74,7 @@ namespace FW.BitX.TestApp
 		private void btnGetTrades_Click(object sender, EventArgs e)
 		{
 			var client = new BitXClient();
-			var tradeInfo = client.GetTradesFromApi();
+			var tradeInfo = client.GetTradesFromApi(BitXPair.XBTZAR);
 			if (tradeInfo.OK) { 
 				PopulateListView(lvTrades, tradeInfo.PayloadResponse.Trades, TradeMap);
 			}

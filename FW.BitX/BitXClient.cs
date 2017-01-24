@@ -206,14 +206,24 @@ namespace FW.BitX
 			}
 		}
 
-		public ResponseWrapper<TickerInfo> GetTickerInfoFromWeb()
+		public ResponseWrapper<TickerInfo> GetTickerInfoFromWeb(Enums.BitXPair pair)
 		{
-			return GetTickerInfoFromEndPoint(BaseUrlWeb + "ticker?pair=XBTZAR");
+			var pairStr = BitXEnumResolver.GetStringForPair(pair);
+			return GetTickerInfoFromEndPoint(
+			BaseUrlWeb
+				+ "ticker"
+				+ "?pair=" + HttpUtility.UrlEncode(pairStr)
+			);
 		}
 
-		public ResponseWrapper<TickerInfo> GetTickerInfoFromApi()
+		public ResponseWrapper<TickerInfo> GetTickerInfoFromApi(Enums.BitXPair pair)
 		{
-			return GetTickerInfoFromEndPoint(BaseUrlApi + "ticker?pair=XBTZAR");
+			var pairStr = BitXEnumResolver.GetStringForPair(pair);
+			return GetTickerInfoFromEndPoint(
+			BaseUrlApi
+				+ "ticker"
+				+ "?pair=" + HttpUtility.UrlEncode(pairStr)
+			);
 		}
 
 		private ResponseWrapper<TickerInfo> GetTickerInfoFromEndPoint(string url)
@@ -237,14 +247,24 @@ namespace FW.BitX
 			return result;
 		}
 
-		public ResponseWrapper<OrderBook> GetOrderBookFromWeb()
+		public ResponseWrapper<OrderBook> GetOrderBookFromWeb(Enums.BitXPair pair)
 		{
-			return GetOrderBookFromEndpoint(BaseUrlWeb + "orderbook?pair=XBTZAR");
+			var pairStr = BitXEnumResolver.GetStringForPair(pair);
+			return GetOrderBookFromEndpoint(
+			BaseUrlWeb
+				+ "orderbook"
+				+ "?pair=" + HttpUtility.UrlEncode(pairStr)
+			);
 		}
 
-		public ResponseWrapper<OrderBook> GetOrderBookFromApi()
+		public ResponseWrapper<OrderBook> GetOrderBookFromApi(Enums.BitXPair pair)
 		{
-			return GetOrderBookFromEndpoint(BaseUrlApi + "orderbook?pair=XBTZAR");
+			var pairStr = BitXEnumResolver.GetStringForPair(pair);
+			return GetOrderBookFromEndpoint(
+			BaseUrlApi
+				+ "orderbook"
+				+ "?pair=" + HttpUtility.UrlEncode(pairStr)
+			);
 		}
 
 		private ResponseWrapper<OrderBook> GetOrderBookFromEndpoint(string url)
@@ -279,16 +299,24 @@ namespace FW.BitX
 			}
 		}
 
-		public ResponseWrapper<TradeInfo> GetTradesFromWeb(long? since = null)
+		public ResponseWrapper<TradeInfo> GetTradesFromWeb(Enums.BitXPair pair, long? since = null)
 		{
-			return GetTradesFromUrl(BaseUrlWeb + "trades?pair=XBTZAR"
+			var pairStr = BitXEnumResolver.GetStringForPair(pair);
+			return GetTradesFromUrl(
+			BaseUrlWeb
+				+ "trades"
+				+ "?pair=" + HttpUtility.UrlEncode(pairStr)
 				+ (since.HasValue ? "&since=" + HttpUtility.UrlEncode(since.Value.ToString()) : "")
 			);
 		}
 
-		public ResponseWrapper<TradeInfo> GetTradesFromApi(long? since = null)
+		public ResponseWrapper<TradeInfo> GetTradesFromApi(Enums.BitXPair pair, long? since = null)
 		{
-			return GetTradesFromUrl(BaseUrlApi + "trades?pair=XBTZAR"
+			var pairStr = BitXEnumResolver.GetStringForPair(pair);
+			return GetTradesFromUrl(
+			BaseUrlApi
+				+ "trades"
+				+ "?pair=" + HttpUtility.UrlEncode(pairStr)
 				+ (since.HasValue ? "&since=" + HttpUtility.UrlEncode(since.Value.ToString()) : "")
 			);
 		}

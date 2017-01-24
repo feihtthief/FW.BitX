@@ -1,4 +1,5 @@
-﻿using FW.BitX.Logic;
+﻿using FW.BitX.Enums;
+using FW.BitX.Logic;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -25,7 +26,7 @@ namespace FW.BitX.ManualTests
 
 			//var placeLimitOrderResponse = authorizedClient.PostLimitOrder("XBTZAR", "BID", 0.001m, 15);
 			// TODO: retest when I have some money again.
-			//var placeLimitOrderResponse = authorizedClient.PostLimitOrder(BitXPair.XBTZAR, BitXType.BID, 0.001m, 15);
+			//var placeLimitOrderResponse = authorizedClient.PostLimitOrder(BitXPair.XBTZAR, BitXTransactionType.BID, 0.001m, 15);
 
 			var stopOrderID = "";
 			if (!string.IsNullOrEmpty(stopOrderID))
@@ -83,7 +84,7 @@ namespace FW.BitX.ManualTests
 			if (Over()) return;
 			Console.WriteLine();
 
-			var anon_TickerInfo_ViaApi = anonymousClient.GetTickerInfoFromApi();
+			var anon_TickerInfo_ViaApi = anonymousClient.GetTickerInfoFromApi(BitXPair.XBTZAR);
 			if (anon_TickerInfo_ViaApi.OK)
 			{
 				DumpTickerInfo(anon_TickerInfo_ViaApi.PayloadResponse);
@@ -92,7 +93,7 @@ namespace FW.BitX.ManualTests
 			{
 				Console.WriteLine("Anonymous GetTickerInfo via API Failed: {0}", anon_TickerInfo_ViaApi);
 			}
-			var anon_TickerInfo_ViaWeb = anonymousClient.GetTickerInfoFromWeb();
+			var anon_TickerInfo_ViaWeb = anonymousClient.GetTickerInfoFromWeb(BitXPair.XBTZAR);
 			if (anon_TickerInfo_ViaWeb.OK)
 			{
 				DumpTickerInfo(anon_TickerInfo_ViaWeb.PayloadResponse);
@@ -102,7 +103,7 @@ namespace FW.BitX.ManualTests
 				Console.WriteLine("Anonymous GetTickerInfo via WEB Failed: {0}", anon_TickerInfo_ViaWeb);
 			}
 
-			var authed_TickerInfo_ViaApi = authorizedClient.GetTickerInfoFromApi();
+			var authed_TickerInfo_ViaApi = authorizedClient.GetTickerInfoFromApi(BitXPair.XBTZAR);
 			if (authed_TickerInfo_ViaApi.OK)
 			{
 				DumpTickerInfo(authed_TickerInfo_ViaApi.PayloadResponse);
@@ -111,7 +112,7 @@ namespace FW.BitX.ManualTests
 			{
 				Console.WriteLine("Authenticated GetTickerInfo via API Failed: {0}", authed_TickerInfo_ViaApi);
 			}
-			var authed_TickerInfo_ViaWeb = authorizedClient.GetTickerInfoFromWeb();
+			var authed_TickerInfo_ViaWeb = authorizedClient.GetTickerInfoFromWeb(BitXPair.XBTZAR);
 			if (authed_TickerInfo_ViaWeb.OK)
 			{
 				DumpTickerInfo(authed_TickerInfo_ViaWeb.PayloadResponse);
@@ -178,7 +179,7 @@ namespace FW.BitX.ManualTests
 			if (Over()) return;
 			Console.WriteLine();
 
-			var orderbook = anonymousClient.GetOrderBookFromApi();
+			var orderbook = anonymousClient.GetOrderBookFromApi(BitXPair.XBTZAR);
 			if (orderbook.OK)
 			{
 				var sb = new StringBuilder();
@@ -205,7 +206,7 @@ namespace FW.BitX.ManualTests
 			if (Over()) return;
 			Console.WriteLine();
 
-			var orderbook_ViaApi = anonymousClient.GetOrderBookFromApi();
+			var orderbook_ViaApi = anonymousClient.GetOrderBookFromApi(BitXPair.XBTZAR);
 			if (orderbook_ViaApi.OK)
 			{
 				DumpOrderBook(orderbook_ViaApi.PayloadResponse);
@@ -216,7 +217,7 @@ namespace FW.BitX.ManualTests
 			}
 			Console.WriteLine();
 
-			var orderbook_ViaWeb = anonymousClient.GetOrderBookFromWeb();
+			var orderbook_ViaWeb = anonymousClient.GetOrderBookFromWeb(BitXPair.XBTZAR);
 			if (orderbook_ViaWeb.OK)
 			{
 				DumpOrderBook(orderbook_ViaWeb.PayloadResponse);
@@ -253,7 +254,7 @@ namespace FW.BitX.ManualTests
 		{
 			//var since = BitXUnixTime.BitXUnixTimeFromDateTimeUTC(DateTime.Now.Date.AddDays(-10).ToUniversalTime());
 			var since = BitXUnixTime.BitXUnixTimeFromDateTimeUTC(DateTime.Now.Date.ToUniversalTime());
-			var ti = anonymousClient.GetTradesFromApi(since);
+			var ti = anonymousClient.GetTradesFromApi(BitXPair.XBTZAR, since);
 			var min = ti.PayloadResponse.Trades.Min(t => t.TimeStampUTC);
 			var max = ti.PayloadResponse.Trades.Max(t => t.TimeStampUTC);
 		}
@@ -262,7 +263,7 @@ namespace FW.BitX.ManualTests
 		{
 			Console.WriteLine("Trades via API");
 			var startDT = DateTime.Now;
-			var ti_A = anonymousClient.GetTradesFromApi();
+			var ti_A = anonymousClient.GetTradesFromApi(BitXPair.XBTZAR);
 			var endDT = DateTime.Now;
 			if (ti_A.OK)
 			{
@@ -283,7 +284,7 @@ namespace FW.BitX.ManualTests
 
 			Console.WriteLine("Trades via WEB");
 			startDT = DateTime.Now;
-			var ti_W = anonymousClient.GetTradesFromWeb();
+			var ti_W = anonymousClient.GetTradesFromWeb(BitXPair.XBTZAR);
 			endDT = DateTime.Now;
 
 			if (ti_W.OK)
