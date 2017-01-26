@@ -50,6 +50,10 @@ namespace FW.BitX
 
 		// done : stop order
 
+		// TODO: xxx distinguish between :
+		//   market trades  ( GET https://api.mybitx.com/api/1/trades     | curl https://api.mybitx.com/api/1/trades?pair=XBTZAR )
+		//   private trades ( GET https://api.mybitx.com/api/1/listtrades | curl -u keyid:keysecret https://api.mybitx.com/api/1/listtrades?pair=XBTZAR )
+
 		public ResponseWrapper<PostLimitOrderResponse> PostLimitOrder(Enums.BitXPair pair, Enums.BitXTransactionType transactionType, decimal volume, int price)
 		{
 			// done: enforce pair is something sane from valid pairs enum/const-class (like XBTZAR)

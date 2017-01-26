@@ -52,6 +52,7 @@
     <Compile Include="Entities\Local\OrderTrade.cs" />
     <Compile Include="Entities\Local\PendingTransactionEntry.cs" />
     <Compile Include="Entities\Local\PostLimitOrderResponse.cs" />
+    <Compile Include="Entities\Local\PrivateTradeInfo.cs" />
     <Compile Include="Entities\Local\StopOrderResponse.cs" />
     <Compile Include="Entities\Local\TickerListEntry.cs" />
     <Compile Include="Entities\Local\TickerInfo.cs" />
