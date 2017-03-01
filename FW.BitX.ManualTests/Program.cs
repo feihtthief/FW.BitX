@@ -56,8 +56,10 @@ namespace FW.BitX.ManualTests
 				}
 			}
 
-			TestGetTrades();
-			TestGetTradesWithSince();
+			TestGetPrivateTrades();
+
+			TestGetMarketTrades();
+			TestGetMarketTradesWithSince();
 
 			if (Over()) return;
 			Console.WriteLine();
@@ -250,20 +252,36 @@ namespace FW.BitX.ManualTests
 
 		}
 
-		private static void TestGetTradesWithSince()
+		private static void TestGetPrivateTrades()
+		{
+			var privateTradeInfo = authorizedClient.GetPrivateTradesFromApi(BitXPair.XBTZAR);
+			if (privateTradeInfo.OK)
+			{
+				foreach (var item in privateTradeInfo.PayloadResponse.Trades)
+				{
+					Console.WriteLine("{0}", item.OrderID);
+				}
+			}
+			else
+			{
+				Console.WriteLine("Authenticated GetPrivateTradesFromApi via API Failed: {0}", privateTradeInfo);
+			}
+		}
+
+		private static void TestGetMarketTradesWithSince()
 		{
 			//var since = BitXUnixTime.BitXUnixTimeFromDateTimeUTC(DateTime.Now.Date.AddDays(-10).ToUniversalTime());
 			var since = BitXUnixTime.BitXUnixTimeFromDateTimeUTC(DateTime.Now.Date.ToUniversalTime());
-			var ti = anonymousClient.GetTradesFromApi(BitXPair.XBTZAR, since);
+			var ti = anonymousClient.GetMarketTradesFromApi(BitXPair.XBTZAR, since);
 			var min = ti.PayloadResponse.Trades.Min(t => t.TimeStampUTC);
 			var max = ti.PayloadResponse.Trades.Max(t => t.TimeStampUTC);
 		}
 
-		private static void TestGetTrades()
+		private static void TestGetMarketTrades()
 		{
 			Console.WriteLine("Trades via API");
 			var startDT = DateTime.Now;
-			var ti_A = anonymousClient.GetTradesFromApi(BitXPair.XBTZAR);
+			var ti_A = anonymousClient.GetMarketTradesFromApi(BitXPair.XBTZAR);
 			var endDT = DateTime.Now;
 			if (ti_A.OK)
 			{
@@ -284,7 +302,7 @@ namespace FW.BitX.ManualTests
 
 			Console.WriteLine("Trades via WEB");
 			startDT = DateTime.Now;
-			var ti_W = anonymousClient.GetTradesFromWeb(BitXPair.XBTZAR);
+			var ti_W = anonymousClient.GetMarketTradesFromWeb(BitXPair.XBTZAR);
 			endDT = DateTime.Now;
 
 			if (ti_W.OK)

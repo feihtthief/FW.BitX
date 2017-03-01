@@ -18,7 +18,7 @@ namespace FW.BitX.TestApp
 	{
 		private static readonly string NL = Environment.NewLine;
 
-		private List<Func<Trade, string>> TradeMap;
+		private List<Func<MarketTrade, string>> TradeMap;
 
 		public MainForm()
 		{
@@ -53,18 +53,18 @@ namespace FW.BitX.TestApp
 			lblMessages.Text = message;
 		}
 
-		private List<Func<Trade, string>> BuildTradesMap(ListView listview)
+		private List<Func<MarketTrade, string>> BuildTradesMap(ListView listview)
 		{
-			var result = new List<Func<Trade, string>>();
+			var result = new List<Func<MarketTrade, string>>();
 			foreach (ColumnHeader item in listview.Columns)
 			{
 				switch (item.Text)
 				{
-					case "TimeStamp": result.Add(new Func<Trade, string>(trade => { return trade.TimeStampUTC.ToLocalTime().ToString(); })); break;
-					case "Price": result.Add(new Func<Trade, string>(trade => { return trade.Price.ToString(); })); break;
-					case "Volume": result.Add(new Func<Trade, string>(trade => { return trade.Volume.ToString(); })); break;
+					case "TimeStamp": result.Add(new Func<MarketTrade, string>(trade => { return trade.TimeStampUTC.ToLocalTime().ToString(); })); break;
+					case "Price": result.Add(new Func<MarketTrade, string>(trade => { return trade.Price.ToString(); })); break;
+					case "Volume": result.Add(new Func<MarketTrade, string>(trade => { return trade.Volume.ToString(); })); break;
 					default:
-						result.Add(new Func<Trade, string>(trade => { return item.Text + "???"; }));
+						result.Add(new Func<MarketTrade, string>(trade => { return item.Text + "???"; }));
 						break;
 				}
 			}
@@ -74,7 +74,7 @@ namespace FW.BitX.TestApp
 		private void btnGetTrades_Click(object sender, EventArgs e)
 		{
 			var client = new BitXClient();
-			var tradeInfo = client.GetTradesFromApi(BitXPair.XBTZAR);
+			var tradeInfo = client.GetMarketTradesFromApi(BitXPair.XBTZAR);
 			if (tradeInfo.OK) { 
 				PopulateListView(lvTrades, tradeInfo.PayloadResponse.Trades, TradeMap);
 			}

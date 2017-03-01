@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 
 namespace FW.BitX.Entities.Local
 {
-	// todo: xxx rename to MarketTrade
-	public class Trade
+	public class MarketTrade
 	{
 		public decimal Price { get; set; }
 		public decimal Volume { get; set; }

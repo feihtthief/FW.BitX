@@ -29,5 +29,15 @@ namespace FW.BitX.Enums
 			}
 		}
 
+		public static Enums.BitXPair GetPairForString(string pairString)
+		{
+			switch (pairString)
+			{
+				case "XBTZAR": return BitXPair.XBTZAR;
+				default:
+					throw new Exception("Invalid or unknown pair string");
+			}
+		}
+
 	}
 }

@@ -6,15 +6,14 @@ using System.Threading.Tasks;
 
 namespace FW.BitX.Entities.Local
 {
-	// todo: xxx rename to MarketTradeInfo
-	public class TradeInfo
+	public class MarketTradeInfo
 	{
 		public string Currency { get; set; }
-		public List<Trade> Trades { get; private set; }
+		public List<MarketTrade> Trades { get; private set; }
 
-		public TradeInfo()
+		public MarketTradeInfo()
 		{
-			this.Trades = new List<Trade>();
+			this.Trades = new List<MarketTrade>();
 		}
 
 	}

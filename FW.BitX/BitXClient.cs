@@ -303,10 +303,10 @@ namespace FW.BitX
 			}
 		}
 
-		public ResponseWrapper<TradeInfo> GetTradesFromWeb(Enums.BitXPair pair, long? since = null)
+		public ResponseWrapper<MarketTradeInfo> GetMarketTradesFromWeb(Enums.BitXPair pair, long? since = null)
 		{
 			var pairStr = BitXEnumResolver.GetStringForPair(pair);
-			return GetTradesFromUrl(
+			return GetMarketTradesFromUrl(
 			BaseUrlWeb
 				+ "trades"
 				+ "?pair=" + HttpUtility.UrlEncode(pairStr)
@@ -314,10 +314,10 @@ namespace FW.BitX
 			);
 		}
 
-		public ResponseWrapper<TradeInfo> GetTradesFromApi(Enums.BitXPair pair, long? since = null)
+		public ResponseWrapper<MarketTradeInfo> GetMarketTradesFromApi(Enums.BitXPair pair, long? since = null)
 		{
 			var pairStr = BitXEnumResolver.GetStringForPair(pair);
-			return GetTradesFromUrl(
+			return GetMarketTradesFromUrl(
 			BaseUrlApi
 				+ "trades"
 				+ "?pair=" + HttpUtility.UrlEncode(pairStr)
@@ -325,26 +325,72 @@ namespace FW.BitX
 			);
 		}
 
-		private ResponseWrapper<TradeInfo> GetTradesFromUrl(string url)
+		private ResponseWrapper<MarketTradeInfo> GetMarketTradesFromUrl(string url)
 		{
 			var restClient = new RestClient(_ApiKey, _ApiSecret);
 			var restResponse = restClient.ExecuteRequest(url, null);
-			var result = new ResponseWrapper<TradeInfo>(restResponse, (responseContent) =>
+			var result = new ResponseWrapper<MarketTradeInfo>(restResponse, (responseContent) =>
 			{
-				var payload = JsonConvert.DeserializeObject<BitX_Trade_QueryResponse>(restResponse.ResponseContent);
-				var payloadData = new TradeInfo
+				var payload = JsonConvert.DeserializeObject<BitX_MarketTrade_QueryResponse>(restResponse.ResponseContent);
+				var payloadData = new MarketTradeInfo
 				{
 					Currency = payload.currency,
 				};
 				foreach (var item in payload.trades)
 				{
-					payloadData.Trades.Add(new Trade
+					payloadData.Trades.Add(new MarketTrade
 					{
 						Price = Decimal.Parse(item.price),
 						Volume = Decimal.Parse(item.volume),
 						BitXTimeStamp = item.timestamp,
 						TimeStampUTC = BitXUnixTime.DateTimeUTCFromBitXUnixTime(item.timestamp),
 						IsBuy = item.is_buy,
+					});
+				}
+				return payloadData;
+			});
+			return result;
+		}
+
+
+		public ResponseWrapper<PrivateTradeInfo> GetPrivateTradesFromApi(Enums.BitXPair pair, long? since = null, int? limit = 100)
+		{
+			var pairStr = BitXEnumResolver.GetStringForPair(pair);
+			return GetPrivateTradesFromUrl(
+			BaseUrlApi
+				+ "listtrades"
+				+ "?pair=" + HttpUtility.UrlEncode(pairStr)
+				+ (since.HasValue ? "&since=" + HttpUtility.UrlEncode(since.Value.ToString()) : "")
+				+ (limit.HasValue ? "&limit=" + HttpUtility.UrlEncode(limit.Value.ToString()) : "")
+			);
+		}
+
+		private ResponseWrapper<PrivateTradeInfo> GetPrivateTradesFromUrl(string url)
+		{
+			var restClient = new RestClient(_ApiKey, _ApiSecret);
+			var restResponse = restClient.ExecuteRequest(url, null);
+			var result = new ResponseWrapper<PrivateTradeInfo>(restResponse, (responseContent) =>
+			{
+				var payload = JsonConvert.DeserializeObject<BitX_PrivateTrade_QueryResponse>(restResponse.ResponseContent);
+				var payloadData = new PrivateTradeInfo
+				{
+				};
+				foreach (var item in payload.trades)
+				{
+					payloadData.Trades.Add(new PrivateTrade
+					{
+						Base = Decimal.Parse(item.@base),
+						Counter = Decimal.Parse(item.counter),
+						FeeBase = Decimal.Parse(item.fee_base),
+						FeeCounter = Decimal.Parse(item.fee_counter),
+						IsBuy = item.is_buy,
+						OrderID = item.order_id,
+						Pair = BitXEnumResolver.GetPairForString(item.pair),
+						Price = Decimal.Parse(item.price),
+						Volume = Decimal.Parse(item.volume),
+						BitXTimeStamp = item.timestamp,
+						TimeStampUTC = BitXUnixTime.DateTimeUTCFromBitXUnixTime(item.timestamp),
+						Type = item.type,
 					});
 				}
 				return payloadData;
