@@ -16,10 +16,10 @@ namespace FW.BitX.Entities.Local
 		public bool IsBuy { get; set; }
 		public string OrderID { get; set; }
 		public BitXPair Pair { get; set; }
-		public decimal  Price { get; set; }
+		public decimal Price { get; set; }
 		public long BitXTimeStamp { get; set; }
 		public DateTime TimeStampUTC { get; set; }
 		public string Type { get; set; }
-		public decimal  Volume { get; set; }
+		public decimal Volume { get; set; }
 	}
 }

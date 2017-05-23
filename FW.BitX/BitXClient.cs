@@ -48,6 +48,9 @@ namespace FW.BitX
 
 		// TODO: use PAIRS enum in all places where a pair can be provided
 
+		// TODO: implement a basic rate throttler
+		// TODO: implement an advanced rate throttler
+
 		// done : stop order
 
 		// TODO: xxx distinguish between :

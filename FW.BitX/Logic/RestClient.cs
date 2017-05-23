@@ -23,9 +23,13 @@ namespace FW.BitX.Logic
 
 		public RestResponse ExecuteRequest(string url, string data)
 		{
+			Console.ForegroundColor = ConsoleColor.DarkCyan;
+			Console.WriteLine("URL: {0}", url);
+			Console.ResetColor();
 			var result = new RestResponse();
 			try
 			{
+				// TODO: rate-throttle/govern here-ish
 				var webReq = HttpWebRequest.Create(url);
 				if (false
 					|| (!string.IsNullOrWhiteSpace(_Username))
