@@ -339,16 +339,19 @@ namespace FW.BitX
 				{
 					Currency = payload.currency,
 				};
-				foreach (var item in payload.trades)
+				if (payload.trades != null)
 				{
-					payloadData.Trades.Add(new MarketTrade
+					foreach (var item in payload.trades)
 					{
-						Price = Decimal.Parse(item.price),
-						Volume = Decimal.Parse(item.volume),
-						BitXTimeStamp = item.timestamp,
-						TimeStampUTC = BitXUnixTime.DateTimeUTCFromBitXUnixTime(item.timestamp),
-						IsBuy = item.is_buy,
-					});
+						payloadData.Trades.Add(new MarketTrade
+						{
+							Price = Decimal.Parse(item.price),
+							Volume = Decimal.Parse(item.volume),
+							BitXTimeStamp = item.timestamp,
+							TimeStampUTC = BitXUnixTime.DateTimeUTCFromBitXUnixTime(item.timestamp),
+							IsBuy = item.is_buy,
+						});
+					}
 				}
 				return payloadData;
 			});
@@ -378,23 +381,26 @@ namespace FW.BitX
 				var payloadData = new PrivateTradeInfo
 				{
 				};
-				foreach (var item in payload.trades)
+				if (payload.trades != null)
 				{
-					payloadData.Trades.Add(new PrivateTrade
+					foreach (var item in payload.trades)
 					{
-						Base = Decimal.Parse(item.@base),
-						Counter = Decimal.Parse(item.counter),
-						FeeBase = Decimal.Parse(item.fee_base),
-						FeeCounter = Decimal.Parse(item.fee_counter),
-						IsBuy = item.is_buy,
-						OrderID = item.order_id,
-						Pair = BitXEnumResolver.GetPairForString(item.pair),
-						Price = Decimal.Parse(item.price),
-						Volume = Decimal.Parse(item.volume),
-						BitXTimeStamp = item.timestamp,
-						TimeStampUTC = BitXUnixTime.DateTimeUTCFromBitXUnixTime(item.timestamp),
-						Type = item.type,
-					});
+						payloadData.Trades.Add(new PrivateTrade
+						{
+							Base = Decimal.Parse(item.@base),
+							Counter = Decimal.Parse(item.counter),
+							FeeBase = Decimal.Parse(item.fee_base),
+							FeeCounter = Decimal.Parse(item.fee_counter),
+							IsBuy = item.is_buy,
+							OrderID = item.order_id,
+							Pair = BitXEnumResolver.GetPairForString(item.pair),
+							Price = Decimal.Parse(item.price),
+							Volume = Decimal.Parse(item.volume),
+							BitXTimeStamp = item.timestamp,
+							TimeStampUTC = BitXUnixTime.DateTimeUTCFromBitXUnixTime(item.timestamp),
+							Type = item.type,
+						});
+					}
 				}
 				return payloadData;
 			});
