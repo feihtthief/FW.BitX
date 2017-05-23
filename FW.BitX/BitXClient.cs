@@ -359,7 +359,7 @@ namespace FW.BitX
 		}
 
 
-		public ResponseWrapper<PrivateTradeInfo> GetPrivateTradesFromApi(Enums.BitXPair pair, long? since = null, int? limit = 100)
+		public ResponseWrapper<PrivateTradeInfo> GetPrivateTradesFromApi(Enums.BitXPair pair, long? since = null, int? limit = null)
 		{
 			var pairStr = BitXEnumResolver.GetStringForPair(pair);
 			return GetPrivateTradesFromUrl(
