@@ -86,9 +86,12 @@
     <Compile Include="Enums\BitXPair.cs" />
     <Compile Include="Enums\BitXTransactionType.cs" />
     <Compile Include="Logic\BitXUnixTime.cs" />
+    <Compile Include="Logic\IGovernor.cs" />
+    <Compile Include="Logic\NoDelayGovernor.cs" />
     <Compile Include="Logic\ResponseWrapper.cs" />
     <Compile Include="Logic\RestClient.cs" />
     <Compile Include="Logic\RestResponse.cs" />
+    <Compile Include="Logic\SimpleRpmGovernor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

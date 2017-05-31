@@ -12,17 +12,32 @@ namespace FW.BitX.Logic
 	{
 		private string _Username;
 		private string _Password;
+		private IGovernor _Governor;
 
-		public RestClient() : this(null, null) { }
+		public RestClient() : this(null, null, null) { }
+		static int last = Environment.TickCount;
 
-		public RestClient(string username, string password)
+		public RestClient(string username, string password, IGovernor governor)
 		{
 			this._Username = username;
 			this._Password = password;
+			this._Governor = (governor != null)
+				? governor
+				: new NoDelayGovernor()
+			;
 		}
 
 		public RestResponse ExecuteRequest(string url, string data)
 		{
+			var start = Environment.TickCount;
+			_Governor.WaitTurn();
+			var end = Environment.TickCount;
+			var diff = end - start;
+			var diffTotal = end - last;
+			last = end;
+			Console.ForegroundColor = ConsoleColor.DarkGreen;
+			Console.WriteLine("Delay from governor: {0,60:N0} ms", diff);
+			Console.WriteLine("Total Delay:         {0,60:N0} ms", diffTotal);
 			Console.ForegroundColor = ConsoleColor.DarkCyan;
 			Console.WriteLine("URL: {0}", url);
 			Console.ResetColor();
