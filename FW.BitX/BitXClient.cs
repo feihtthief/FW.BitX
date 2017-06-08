@@ -236,7 +236,7 @@ namespace FW.BitX
 
 		private ResponseWrapper<TickerInfo> GetTickerInfoFromEndPoint(string url)
 		{
-			var restClient = GetAuthenticatedRestClient();
+			var restClient = GetAnonymousRestClient();
 			var restResponse = restClient.ExecuteRequest(url, null);
 			var result = new ResponseWrapper<TickerInfo>(restResponse, (responseContent) =>
 			{
