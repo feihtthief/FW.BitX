@@ -18,7 +18,7 @@ namespace FW.BitX.Logic
 			if (rpm <= 0) { throw new ArgumentException("RPM has to be positive", "rpm"); }
 			this.RPM = rpm;
 			this.Step = (int)(60m / this.RPM * 1000m);
-			this.Step += 15; // because computers suck
+			this.Step += 100; // because computers suck
 			this.NextTick = Environment.TickCount - Step;
 		}
 

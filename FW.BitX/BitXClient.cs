@@ -19,21 +19,24 @@ namespace FW.BitX
 
 		private string _ApiKey;
 		private string _ApiSecret;
-		private IGovernor _Governor;
+		private IGovernor _AnonymousGovernor;
+		private IGovernor _AuthenticatedGovernor;
 
 		public BitXClient() : this(null, null) { }
 
-		public BitXClient(string apiKey, string apiSecret) : this(apiKey, apiSecret, null) { }
+		public BitXClient(string apiKey, string apiSecret) : this(apiKey, apiSecret, null, null) { }
 
-		public BitXClient(string apiKey, string apiSecret, IGovernor governor)
+		public BitXClient(string apiKey, string apiSecret, IGovernor anonymousGovernor, IGovernor authenticatedGovernor)
 		{
 			this._ApiKey = apiKey;
 			this._ApiSecret = apiSecret;
-			this._Governor = (governor != null)
-				? governor
-				: (string.IsNullOrWhiteSpace(_ApiKey) && string.IsNullOrWhiteSpace(_ApiSecret))
-					? new SimpleRpmGovernor(10)
-					: new SimpleRpmGovernor(9)
+			this._AuthenticatedGovernor = (authenticatedGovernor != null)
+				? authenticatedGovernor
+				: new SimpleRpmGovernor(60)
+			;
+			this._AnonymousGovernor = (anonymousGovernor != null)
+				? anonymousGovernor
+				: new SimpleRpmGovernor(10)
 			;
 		}
 
@@ -85,7 +88,7 @@ namespace FW.BitX
 
 		private ResponseWrapper<PostLimitOrderResponse> PostLimitOrderToEndpoint(string url, string data)
 		{
-			var restClient = GetRestClient();
+			var restClient = GetAuthenticatedRestClient();
 			var restResponse = restClient.ExecuteRequest(url, data);
 			var result = new ResponseWrapper<PostLimitOrderResponse>(restResponse, (responseContent) =>
 			{
@@ -111,7 +114,7 @@ namespace FW.BitX
 
 		private ResponseWrapper<StopOrderResponse> PostStopOrderToEndpoint(string url, string data)
 		{
-			var restClient = GetRestClient();
+			var restClient = GetAuthenticatedRestClient();
 			var restResponse = restClient.ExecuteRequest(url, data);
 			var result = new ResponseWrapper<StopOrderResponse>(restResponse, (responseContent) =>
 			{
@@ -127,14 +130,14 @@ namespace FW.BitX
 
 		public ResponseWrapper<OrderInfo> GetOrderInfo(string orderID)
 		{
-			return GetOrderInfoEndPoint(BaseUrlApi + "orders/"
+			return GetOrderInfoFromEndPoint(BaseUrlApi + "orders/"
 				+ HttpUtility.UrlEncode(orderID)
 				);
 		}
 
-		private ResponseWrapper<OrderInfo> GetOrderInfoEndPoint(string url)
+		private ResponseWrapper<OrderInfo> GetOrderInfoFromEndPoint(string url)
 		{
-			var restClient = GetRestClient();
+			var restClient = GetAuthenticatedRestClient();
 			var restResponse = restClient.ExecuteRequest(url, null);
 			var result = new ResponseWrapper<OrderInfo>(restResponse, (responseContent) =>
 			{
@@ -188,7 +191,7 @@ namespace FW.BitX
 
 		private ResponseWrapper<TickerList> GetTickerListFromEndPoint(string url)
 		{
-			var restClient = GetRestClient();
+			var restClient = GetAnonymousRestClient();
 			var restResponse = restClient.ExecuteRequest(url, null);
 			var result = new ResponseWrapper<TickerList>(restResponse, (responseContent) =>
 			{
@@ -244,7 +247,7 @@ namespace FW.BitX
 
 		private ResponseWrapper<TickerInfo> GetTickerInfoFromEndPoint(string url)
 		{
-			var restClient = GetRestClient();
+			var restClient = GetAuthenticatedRestClient();
 			var restResponse = restClient.ExecuteRequest(url, null);
 			var result = new ResponseWrapper<TickerInfo>(restResponse, (responseContent) =>
 			{
@@ -285,7 +288,7 @@ namespace FW.BitX
 
 		private ResponseWrapper<OrderBook> GetOrderBookFromEndpoint(string url)
 		{
-			var restClient = GetRestClient();
+			var restClient = GetAnonymousRestClient();
 			var restResponse = restClient.ExecuteRequest(url, null);
 			var result = new ResponseWrapper<OrderBook>(restResponse, (responseContent) =>
 			{
@@ -339,7 +342,7 @@ namespace FW.BitX
 
 		private ResponseWrapper<MarketTradeInfo> GetMarketTradesFromUrl(string url)
 		{
-			var restClient = GetRestClient();
+			var restClient = GetAnonymousRestClient();
 			var restResponse = restClient.ExecuteRequest(url, null);
 			var result = new ResponseWrapper<MarketTradeInfo>(restResponse, (responseContent) =>
 			{
@@ -382,7 +385,7 @@ namespace FW.BitX
 
 		private ResponseWrapper<PrivateTradeInfo> GetPrivateTradesFromUrl(string url)
 		{
-			var restClient = GetRestClient();
+			var restClient = GetAuthenticatedRestClient();
 			var restResponse = restClient.ExecuteRequest(url, null);
 			var result = new ResponseWrapper<PrivateTradeInfo>(restResponse, (responseContent) =>
 			{
@@ -423,7 +426,7 @@ namespace FW.BitX
 
 		private ResponseWrapper<List<AccountBalance>> GetBalancesFromUrl(string url)
 		{
-			var restClient = GetRestClient();
+			var restClient = GetAuthenticatedRestClient();
 			var restResponse = restClient.ExecuteRequest(url, null);
 			var result = new ResponseWrapper<List<AccountBalance>>(restResponse, (responseContent) =>
 			{
@@ -455,7 +458,7 @@ namespace FW.BitX
 
 		private ResponseWrapper<List<PendingTransactionEntry>> GetPendingTransactionsFromUrl(string url)
 		{
-			var restClient = GetRestClient();
+			var restClient = GetAuthenticatedRestClient();
 			var restResponse = restClient.ExecuteRequest(url, null);
 			var result = new ResponseWrapper<List<PendingTransactionEntry>>(restResponse, (responseContent) =>
 			{
@@ -491,7 +494,7 @@ namespace FW.BitX
 
 		private ResponseWrapper<List<TransactionEntry>> GetTransactionsFromUrl(string url)
 		{
-			var restClient = GetRestClient();
+			var restClient = GetAuthenticatedRestClient();
 			var restResponse = restClient.ExecuteRequest(url, null);
 			var result = new ResponseWrapper<List<TransactionEntry>>(restResponse, (responseContent) =>
 			{
@@ -517,9 +520,14 @@ namespace FW.BitX
 			return result;
 		}
 
-		private RestClient GetRestClient()
+		private RestClient GetAuthenticatedRestClient()
 		{
-			return new RestClient(_ApiKey, _ApiSecret, _Governor);
+			return new RestClient(_ApiKey, _ApiSecret, _AuthenticatedGovernor);
+		}
+
+		private RestClient GetAnonymousRestClient()
+		{
+			return new RestClient(null, null, _AnonymousGovernor);
 		}
 
 	}

@@ -86,17 +86,18 @@
     <Compile Include="Enums\BitXPair.cs" />
     <Compile Include="Enums\BitXTransactionType.cs" />
     <Compile Include="Logic\BitXUnixTime.cs" />
-    <Compile Include="Logic\IGovernor.cs" />
-    <Compile Include="Logic\NoDelayGovernor.cs" />
+    <Compile Include="Logic\Governors\IGovernor.cs" />
+    <Compile Include="Logic\Governors\NoDelayGovernor.cs" />
+    <Compile Include="Logic\Governors\SimpleRpmGovernor.cs" />
     <Compile Include="Logic\ResponseWrapper.cs" />
     <Compile Include="Logic\RestClient.cs" />
     <Compile Include="Logic\RestResponse.cs" />
-    <Compile Include="Logic\SimpleRpmGovernor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
