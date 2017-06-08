@@ -15,7 +15,6 @@ namespace FW.BitX
 	public class BitXClient
 	{
 		private const string BaseUrlApi = "https://api.mybitx.com/api/1/";
-		private const string BaseUrlWeb = "https://bitx.co/ajax/1/";
 
 		private string _ApiKey;
 		private string _ApiSecret;
@@ -225,16 +224,6 @@ namespace FW.BitX
 			}
 		}
 
-		public ResponseWrapper<TickerInfo> GetTickerInfoFromWeb(Enums.BitXPair pair)
-		{
-			var pairStr = BitXEnumResolver.GetStringForPair(pair);
-			return GetTickerInfoFromEndPoint(
-			BaseUrlWeb
-				+ "ticker"
-				+ "?pair=" + HttpUtility.UrlEncode(pairStr)
-			);
-		}
-
 		public ResponseWrapper<TickerInfo> GetTickerInfoFromApi(Enums.BitXPair pair)
 		{
 			var pairStr = BitXEnumResolver.GetStringForPair(pair);
@@ -264,16 +253,6 @@ namespace FW.BitX
 				return payloadData;
 			});
 			return result;
-		}
-
-		public ResponseWrapper<OrderBook> GetOrderBookFromWeb(Enums.BitXPair pair)
-		{
-			var pairStr = BitXEnumResolver.GetStringForPair(pair);
-			return GetOrderBookFromEndpoint(
-			BaseUrlWeb
-				+ "orderbook"
-				+ "?pair=" + HttpUtility.UrlEncode(pairStr)
-			);
 		}
 
 		public ResponseWrapper<OrderBook> GetOrderBookFromApi(Enums.BitXPair pair)
@@ -316,17 +295,6 @@ namespace FW.BitX
 					Volume = Decimal.Parse(item.volume),
 				});
 			}
-		}
-
-		public ResponseWrapper<MarketTradeInfo> GetMarketTradesFromWeb(Enums.BitXPair pair, long? since = null)
-		{
-			var pairStr = BitXEnumResolver.GetStringForPair(pair);
-			return GetMarketTradesFromUrl(
-			BaseUrlWeb
-				+ "trades"
-				+ "?pair=" + HttpUtility.UrlEncode(pairStr)
-				+ (since.HasValue ? "&since=" + HttpUtility.UrlEncode(since.Value.ToString()) : "")
-			);
 		}
 
 		public ResponseWrapper<MarketTradeInfo> GetMarketTradesFromApi(Enums.BitXPair pair, long? since = null)
