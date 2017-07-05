@@ -88,6 +88,7 @@
     <Compile Include="Logic\BitXUnixTime.cs" />
     <Compile Include="Logic\Governors\IGovernor.cs" />
     <Compile Include="Logic\Governors\NoDelayGovernor.cs" />
+    <Compile Include="Logic\Governors\SimpleDelayGovernor.cs" />
     <Compile Include="Logic\Governors\SimpleRpmGovernor.cs" />
     <Compile Include="Logic\ResponseWrapper.cs" />
     <Compile Include="Logic\RestClient.cs" />

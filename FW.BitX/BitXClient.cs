@@ -35,7 +35,7 @@ namespace FW.BitX
 			;
 			this._AnonymousGovernor = (anonymousGovernor != null)
 				? anonymousGovernor
-				: new SimpleRpmGovernor(10)
+				: new SimpleDelayGovernor(TimeSpan.FromSeconds(10))
 			;
 		}
 
