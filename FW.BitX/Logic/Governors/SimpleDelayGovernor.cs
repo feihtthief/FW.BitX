@@ -16,7 +16,7 @@ namespace FW.BitX.Logic
 		{
 			if (delay.TotalMilliseconds<=0){ throw new ArgumentException("Delay has to be positive", "delay"); }
 			this.Step = (int)(delay.TotalMilliseconds);
-			this.Step += 15; // because computers suck
+			//this.Step += 15; // because computers suck
 			this.NextTick = Environment.TickCount - Step;
 		}
 
